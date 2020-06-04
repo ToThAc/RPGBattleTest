@@ -36,6 +36,7 @@ maxheart = Heart(120)
 player = Character(('SLASH', 'FIREBALL', 'ICE CRYSTAL'))
 enemy = Character(('BITE', 'STOMP', 'SMASH'))
 itemlist = ["HEART"] * 5 + ["SUPER HEART"] * 5 + ["ULTRA HEART"] * 5 + ["MAX HEART"] * 5
+itemmasterlist = ("HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART")
 constantslash = random.randint(60, 100)
 constantfireball = random.randint(60, 100)
 constanticecrystal = random.randint(60, 100)
@@ -75,28 +76,16 @@ def playerturn():
         return True
     elif command == "ITEMS":
         itemstring = f"Which item will you choose: HEART (×{itemlist.count('HEART')}), SUPER HEART (×{itemlist.count('SUPER HEART')}), ULTRA HEART (×{itemlist.count('ULTRA HEART')}), or MAX HEART (×{itemlist.count('MAX HEART')})? "
-        items = validinput(itemstring,("HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"))
+        items = validinput(itemstring,itemmasterlist)
         while items not in itemlist:
-            if items == "HEART":
+            if items in itemmasterlist:
                 print(itemrelinquish)
                 time.sleep(1)
-                items = validinput(itemstring,("HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"))
-            elif items == "SUPER HEART":
-                print(itemrelinquish)
-                time.sleep(1)
-                items = validinput(itemstring,("HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"))
-            elif items == "ULTRA HEART":
-                print(itemrelinquish)
-                time.sleep(1)
-                items = validinput(itemstring,("HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"))
-            elif items == "MAX HEART":
-                print(itemrelinquish)
-                time.sleep(1)
-                items = validinput(itemstring,("HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"))
+                items = validinput(itemstring,itemmasterlist)
             else:
                 print(errormessage)
                 time.sleep(1)
-                items = validinput(itemstring,("HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"))
+                items = validinput(itemstring,itemmasterlist)
         if items == "HEART":
             player.heal(heart)
             print(f"You restored {heart.hp} HP!")
