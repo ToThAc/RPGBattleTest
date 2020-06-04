@@ -51,28 +51,35 @@ damagebite = int((0.1 * (enemy.attack - player.defense) * constantbite) + 0.5)
 damagestomp = int((0.1 * (enemy.attack - player.defense) * constantstomp) + 0.5)
 damagesmash = int((0.1 * (enemy.attack - player.defense) * constantsmash) + 0.5)
 
+def playerattackprompt(promptstring,damagedealt):
+    print(promptstring)
+    time.sleep(2)
+    print("...and inflicted", damagedealt, "damage to ENEMY!")
+    enemy.damage(damagedealt)
+    time.sleep(1)
+
+def playerhealprompt(item):
+    player.heal(item)
+    print(f"You restored {item.hp} HP!")
+    time.sleep(1)
+
+def enemyattackprompt(promptstring,damagedealt):
+    print(promptstring)
+    time.sleep(2)
+    print("...and thus you received", damagedealt, "damage!")
+    player.damage(damagedealt)
+    time.sleep(1)
+
 def playerturn():
     command = validinput(string,("ATTACK", "ITEMS", "FLEE"))
     if command == "ATTACK":
         attack = validinput(attackstring,player.attacks)
         if attack == "SLASH":
-            print("You swung your blade...")
-            time.sleep(2)
-            print("...and inflicted", damageslash, "damage to ENEMY!")
-            enemy.damage(damageslash)
-            time.sleep(1)
+            playerattackprompt("You swung your blade...",damageslash)
         elif attack == "FIREBALL":
-            print("You hurled a fireball...")
-            time.sleep(2)
-            print("...and inflicted", damagefireball, "damage to ENEMY!")
-            enemy.damage(damagefireball)
-            time.sleep(1)
+            playerattackprompt("You hurled a fireball...",damagefireball)
         elif attack == "ICE CRYSTAL":
-            print("You chucked an icicle...")
-            time.sleep(2)
-            print("...and inflicted", damageicecrystal, "damage to ENEMY!")
-            enemy.damage(damageicecrystal)
-            time.sleep(1)
+            playerattackprompt("You chucked an icicle...",damageicecrystal)
         return True
     elif command == "ITEMS":
         itemstring = f"Which item will you choose: HEART (×{itemlist.count('HEART')}), SUPER HEART (×{itemlist.count('SUPER HEART')}), ULTRA HEART (×{itemlist.count('ULTRA HEART')}), or MAX HEART (×{itemlist.count('MAX HEART')})? "
@@ -87,21 +94,13 @@ def playerturn():
                 time.sleep(1)
                 items = validinput(itemstring,itemmasterlist)
         if items == "HEART":
-            player.heal(heart)
-            print(f"You restored {heart.hp} HP!")
-            time.sleep(1)
+            playerhealprompt(heart)
         elif items == "SUPER HEART":
-            player.heal(superheart)
-            print(f"You restored {superheart.hp} HP!")
-            time.sleep(1)
+            playerhealprompt(superheart)
         elif items == "ULTRA HEART":
-            player.heal(ultraheart)
-            print(f"You restored {ultraheart.hp} HP!")
-            time.sleep(1)
+            playerhealprompt(ultraheart)
         elif items == "MAX HEART":
-            player.heal(maxheart)
-            print(f"You restored {maxheart.hp} HP!")
-            time.sleep(1)
+            playerhealprompt(maxheart)
         if player.hitpoints > 1000:
             print("You're already at max HP!")
             player.hitpoints = 1000
@@ -124,23 +123,11 @@ def enemyturn():
     time.sleep(1)
     enemychoice = random.choice(enemy.attacks)
     if enemychoice == "BITE":
-        print("ENEMY latches its jaws onto you...")
-        time.sleep(2)
-        print("...and thus you received", damagebite, "damage!")
-        player.damage(damagebite)
-        time.sleep(1)
+        enemyattackprompt("ENEMY latches its jaws onto you...",damagebite)
     elif enemychoice == "STOMP":
-        print("ENEMY raises its foot onto you...")
-        time.sleep(2)
-        print("...and thus you received", damagestomp, "damage!")
-        player.damage(damagestomp)
-        time.sleep(1)
+        enemyattackprompt("ENEMY raises its foot onto you...",damagestomp)
     elif enemychoice == "SMASH":
-        print("ENEMY charges up to ram into you...")
-        time.sleep(2)
-        print("...and thus you received", damagesmash, "damage!")
-        player.damage(damagesmash)
-        time.sleep(1)
+        enemyattackprompt("ENEMY charges up to ram into you...",damagesmash)
 
 def defeatstate():
     if enemy.hitpoints <= 0:
