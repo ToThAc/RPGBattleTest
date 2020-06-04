@@ -27,7 +27,7 @@ maxheart = Heart(120)
 
 player = Character(('SLASH', 'FIREBALL', 'ICE CRYSTAL'))
 enemy = Character(('BITE', 'STOMP', 'SMASH'))
-itemlist = ["HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"]
+itemlist = ["HEART"] * 5 + ["SUPER HEART"] * 5 + ["ULTRA HEART"] * 5 + ["MAX HEART"] * 5
 constantslash = random.randint(60, 100)
 constantfireball = random.randint(60, 100)
 constanticecrystal = random.randint(60, 100)
@@ -75,11 +75,29 @@ def playerturn():
             time.sleep(1)
         return True
     elif command == "ITEMS":
+        itemstring = f"Which item will you choose: HEART (×{itemlist.count('HEART')}), SUPER HEART (×{itemlist.count('SUPER HEART')}), ULTRA HEART (×{itemlist.count('ULTRA HEART')}), or MAX HEART (×{itemlist.count('MAX HEART')})? "
         items = input(itemstring)
         while items not in itemlist:
-            print(errormessage)
-            time.sleep(1)
-            items = input(itemstring)
+            if items == "HEART":
+                print(itemrelinquish)
+                time.sleep(1)
+                items = input(itemstring)
+            elif items == "SUPER HEART":
+                print(itemrelinquish)
+                time.sleep(1)
+                items = input(itemstring)
+            elif items == "ULTRA HEART":
+                print(itemrelinquish)
+                time.sleep(1)
+                items = input(itemstring)
+            elif items == "MAX HEART":
+                print(itemrelinquish)
+                time.sleep(1)
+                items = input(itemstring)
+            else:
+                print(errormessage)
+                time.sleep(1)
+                items = input(itemstring)
         if items == "HEART":
             player.heal(heart)
             print(f"You restored {heart.hp} HP!")
@@ -162,8 +180,8 @@ time.sleep(1)
 hpstatistics()
 string = "Will you ATTACK, use ITEMS, or FLEE? "
 errormessage = "Command not recognized. Try again."
+itemrelinquish = "You're out of that particular item..."
 attackstring = "Which attack will it be: SLASH, FIREBALL, or ICE CRYSTAL? "
-itemstring = "Which item will you choose: HEART, SUPER HEART, ULTRA HEART, or MAX HEART? "
 while True:
     if not playerturn():
         break
