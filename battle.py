@@ -2,11 +2,11 @@ import random
 import time
 
 class Character:
-	def __init__(self):
+	def __init__(self,attacks):
 		self.hitpoints = 1000
 		self.attack = random.randint(20,30)
 		self.defense = random.randint(10,20)
-		self.attacks = set()
+		self.attacks = attacks
 		self.items = set()
 	def damage(self,hp):
 		self.hitpoints -= hp
@@ -24,10 +24,8 @@ superheart = Heart(60)
 ultraheart = Heart(90)
 maxheart = Heart(120)
 
-player = Character()
-enemy = Character()
-player.attacks = ('SLASH', 'FIREBALL', 'ICE CRYSTAL')
-enemy.attacks = ('BITE', 'STOMP', 'SMASH')
+player = Character(('SLASH', 'FIREBALL', 'ICE CRYSTAL'))
+enemy = Character(('BITE', 'STOMP', 'SMASH'))
 itemlist = ["HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"]
 constantslash = random.randint(60, 100)
 constantfireball = random.randint(60, 100)
