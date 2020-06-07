@@ -56,20 +56,40 @@ def enemyattackprompt(promptstring,damagedealt):
     player.damage(damagedealt)
     time.sleep(1)
 
+class Attack():
+    def __init__(self,name):
+        self.name = name
+        self.constant = 0
+    def calcdamage(self,attacker,defender):
+        return int((0.1 * (attacker - defender) * self.constant) + 0.5)
+
+class PlayerAttack(Attack):
+    def __init__(self,name):
+        super().__init__(name)
+        self.constant = random.randint(60, 100)
+
+class EnemyAttack(Attack):
+    def __init__(self,name):
+        super().__init__(name)
+        self.constant = random.randint(30, 70)
+
 class PlayerCharacter(Character):
     def __init__(self):
         super().__init__()
+        self.slash = PlayerAttack("SLASH")
+        self.fireball = PlayerAttack("FIREBALL")
+        self.icecrystal = PlayerAttack("ICE CRYSTAL")
         self.attacks = ('SLASH', 'FIREBALL', 'ICE CRYSTAL')
-    def taketurn(self):
+    def taketurn(self,defense):
         command = validinput(string,("ATTACK", "ITEMS", "FLEE"))
         if command == "ATTACK":
             attack = validinput(attackstring,self.attacks)
             if attack == "SLASH":
-                playerattackprompt("You swung your blade...",damageslash)
+                playerattackprompt("You swung your blade...",self.slash.calcdamage(self.attack,defense))
             elif attack == "FIREBALL":
-                playerattackprompt("You hurled a fireball...",damagefireball)
+                playerattackprompt("You hurled a fireball...",self.fireball.calcdamage(self.attack,defense))
             elif attack == "ICE CRYSTAL":
-                playerattackprompt("You chucked an icicle...",damageicecrystal)
+                playerattackprompt("You chucked an icicle...",self.icecrystal.calcdamage(self.attack,defense))
             return True
         elif command == "ITEMS":
             itemstring = f"Which item will you choose: HEART (×{itemlist.count('HEART')}), SUPER HEART (×{itemlist.count('SUPER HEART')}), ULTRA HEART (×{itemlist.count('ULTRA HEART')}), or MAX HEART (×{itemlist.count('MAX HEART')})? "
@@ -105,34 +125,25 @@ class PlayerCharacter(Character):
 class EnemyCharacter(Character):
     def __init__(self):
         super().__init__()
+        self.bite = EnemyAttack("BITE")
+        self.stomp = EnemyAttack("STOMP")
+        self.smash = EnemyAttack("SMASH")
         self.attacks = ('BITE', 'STOMP', 'SMASH')
-    def taketurn(self):
+    def taketurn(self,defense):
         print("ENEMY readies an attack!")
         time.sleep(1)
         enemychoice = random.choice(self.attacks)
         if enemychoice == "BITE":
-            enemyattackprompt("ENEMY latches its jaws onto you...",damagebite)
+            enemyattackprompt("ENEMY latches its jaws onto you...",self.bite.calcdamage(self.attack,defense))
         elif enemychoice == "STOMP":
-            enemyattackprompt("ENEMY raises its foot onto you...",damagestomp)
+            enemyattackprompt("ENEMY raises its foot onto you...",self.stomp.calcdamage(self.attack,defense))
         elif enemychoice == "SMASH":
-            enemyattackprompt("ENEMY charges up to ram into you...",damagesmash)
+            enemyattackprompt("ENEMY charges up to ram into you...",self.smash.calcdamage(self.attack,defense))
 
 player = PlayerCharacter()
 enemy = EnemyCharacter()
 itemlist = ["HEART"] * 5 + ["SUPER HEART"] * 5 + ["ULTRA HEART"] * 5 + ["MAX HEART"] * 5
 itemmasterlist = ("HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART")
-constantslash = random.randint(60, 100)
-constantfireball = random.randint(60, 100)
-constanticecrystal = random.randint(60, 100)
-constantbite = random.randint(30, 70)
-constantstomp = random.randint(30, 70)
-constantsmash = random.randint(30, 70)
-damageslash = int((0.1 * (player.attack - enemy.defense) * constantslash) + 0.5)
-damagefireball = int((0.1 * (player.attack - enemy.defense) * constantfireball) + 0.5)
-damageicecrystal = int((0.1 * (player.attack - enemy.defense) * constanticecrystal) + 0.5)
-damagebite = int((0.1 * (enemy.attack - player.defense) * constantbite) + 0.5)
-damagestomp = int((0.1 * (enemy.attack - player.defense) * constantstomp) + 0.5)
-damagesmash = int((0.1 * (enemy.attack - player.defense) * constantsmash) + 0.5)
 
 def hpstatistics():
     print(f"ENEMY has {enemy.hitpoints}/1000 HP.")
@@ -169,11 +180,11 @@ errormessage = "Command not recognized. Try again."
 itemrelinquish = "You're out of that particular item..."
 attackstring = "Which attack will it be: SLASH, FIREBALL, or ICE CRYSTAL? "
 while True:
-    if not player.taketurn():
+    if not player.taketurn(enemy.defense):
         break
     if defeatstate():
         break
-    enemy.taketurn()
+    enemy.taketurn(player.defense)
     if defeatstate():
         break
     hpstatistics()
