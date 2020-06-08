@@ -30,10 +30,13 @@ def validinput(commandstring,validlist):
             x = input(commandstring)
     return x
 
-heart = Heart()
-superheart = Heart(60)
-ultraheart = Heart(90)
-maxheart = Heart(120)
+itemlist = ["HEART"] * 5 + ["SUPER HEART"] * 5 + ["ULTRA HEART"] * 5 + ["MAX HEART"] * 5
+itemmasterlist = {}
+
+itemmasterlist["HEART"] = Heart()
+itemmasterlist["SUPER HEART"] = Heart(60)
+itemmasterlist["ULTRA HEART"] = Heart(90)
+itemmasterlist["MAX HEART"] = Heart(120)
 
 command = ''
 
@@ -98,42 +101,27 @@ class PlayerCharacter(Character):
                     continue
             elif command == "ITEMS":
                 itemstring = f"Which item will you choose: HEART (×{itemlist.count('HEART')}), SUPER HEART (×{itemlist.count('SUPER HEART')}), ULTRA HEART (×{itemlist.count('ULTRA HEART')}), or MAX HEART (×{itemlist.count('MAX HEART')})? (You can also type \"BACK\" to go back.) "
-                items = validinput(itemstring,itemmasterlist + ["BACK"])
+                items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
                 while items not in itemlist:
                     if items in itemmasterlist:
                         print(itemrelinquish)
                         time.sleep(1)
-                        items = validinput(itemstring,itemmasterlist + ["BACK"])
+                        items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
                     elif items == "BACK":
                         break
                     else:
                         print(errormessage)
                         time.sleep(1)
-                        items = validinput(itemstring,itemmasterlist + ["BACK"])
-                if items == "HEART":
-                    playerhealprompt(heart)
-                    itemlist.remove(items)
-                    return True
-                elif items == "SUPER HEART":
-                    playerhealprompt(superheart)
-                    itemlist.remove(items)
-                    return True
-                elif items == "ULTRA HEART":
-                    playerhealprompt(ultraheart)
-                    itemlist.remove(items)
-                    return True
-                elif items == "MAX HEART":
-                    playerhealprompt(maxheart)
-                    itemlist.remove(items)
-                    return True
-                elif items == "BACK":
+                        items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
+                if items == "BACK":
                     continue
-                if player.hitpoints > 1000:
-                    print("You're already at max HP!")
+                playerhealprompt(itemmasterlist[items])
+                itemlist.remove(items)
+                if player.hitpoints >= 1000:
+                    print("You're at max HP!")
                     player.hitpoints = 1000
                     time.sleep(1)
-                    itemlist.remove(items)
-                    return True
+                return True
             elif command == "FLEE":
                 print("You ran away!")
                 time.sleep(1)
@@ -159,8 +147,6 @@ class EnemyCharacter(Character):
 
 player = PlayerCharacter()
 enemy = EnemyCharacter()
-itemlist = ["HEART"] * 5 + ["SUPER HEART"] * 5 + ["ULTRA HEART"] * 5 + ["MAX HEART"] * 5
-itemmasterlist = ["HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"]
 
 def hpstatistics():
     print(f"ENEMY has {enemy.hitpoints}/1000 HP.")
