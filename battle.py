@@ -106,12 +106,13 @@ class PlayerCharacter(Character):
                         items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
                 if items == "BACK":
                     continue
+                if player.hitpoints == 1000:
+                    print("You're already at max HP!")
+                    time.sleep(1)
+                    continue
                 playerhealprompt(itemmasterlist[items])
                 itemlist.remove(items)
-                if player.hitpoints >= 1000:
-                    print("You're at max HP!")
-                    player.hitpoints = 1000
-                    time.sleep(1)
+                player.hitpoints = min(player.hitpoints,1000)
                 return True
             elif command == "FLEE":
                 print("You ran away!")
