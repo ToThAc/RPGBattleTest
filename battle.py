@@ -31,13 +31,7 @@ def validinput(commandstring,validlist):
     return x
 
 itemlist = ["HEART"] * 5 + ["SUPER HEART"] * 5 + ["ULTRA HEART"] * 5 + ["MAX HEART"] * 5
-itemmasterlist = {}
-
-itemmasterlist["HEART"] = Heart()
-itemmasterlist["SUPER HEART"] = Heart(60)
-itemmasterlist["ULTRA HEART"] = Heart(90)
-itemmasterlist["MAX HEART"] = Heart(120)
-
+itemmasterlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
 command = ''
 
 def playerattackprompt(promptstring,damagedealt):
