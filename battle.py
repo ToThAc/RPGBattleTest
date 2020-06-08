@@ -79,23 +79,20 @@ class EnemyAttack(Attack):
 class PlayerCharacter(Character):
     def __init__(self):
         super().__init__()
-        self.slash = PlayerAttack("SLASH")
-        self.fireball = PlayerAttack("FIREBALL")
-        self.icecrystal = PlayerAttack("ICE CRYSTAL")
-        self.attacks = ['SLASH', 'FIREBALL', 'ICE CRYSTAL']
+        self.attacks = {i:PlayerAttack(i) for i in ["SLASH", "FIREBALL", "ICE CRYSTAL"]}
     def taketurn(self,defense):
         while True:
             command = validinput(string,("ATTACK", "ITEMS", "FLEE"))
             if command == "ATTACK":
-                attack = validinput(attackstring,self.attacks + ["BACK"])
+                attack = validinput(attackstring,list(self.attacks.keys()) + ["BACK"])
                 if attack == "SLASH":
-                    playerattackprompt("You swung your blade...",self.slash.calcdamage(self.attack,defense))
+                    playerattackprompt("You swung your blade...",self.attacks[attack].calcdamage(self.attack,defense))
                     return True
                 elif attack == "FIREBALL":
-                    playerattackprompt("You hurled a fireball...",self.fireball.calcdamage(self.attack,defense))
+                    playerattackprompt("You hurled a fireball...",self.attacks[attack].calcdamage(self.attack,defense))
                     return True
                 elif attack == "ICE CRYSTAL":
-                    playerattackprompt("You chucked an icicle...",self.icecrystal.calcdamage(self.attack,defense))
+                    playerattackprompt("You chucked an icicle...",self.attacks[attack].calcdamage(self.attack,defense))
                     return True
                 elif attack == "BACK":
                     continue
@@ -130,20 +127,17 @@ class PlayerCharacter(Character):
 class EnemyCharacter(Character):
     def __init__(self):
         super().__init__()
-        self.bite = EnemyAttack("BITE")
-        self.stomp = EnemyAttack("STOMP")
-        self.smash = EnemyAttack("SMASH")
-        self.attacks = ('BITE', 'STOMP', 'SMASH')
+        self.attacks = {i:EnemyAttack(i) for i in ["BITE", "STOMP", "SMASH"]}
     def taketurn(self,defense):
         print("ENEMY readies an attack!")
         time.sleep(1)
-        enemychoice = random.choice(self.attacks)
+        enemychoice = random.choice(list(self.attacks.keys()))
         if enemychoice == "BITE":
-            enemyattackprompt("ENEMY latches its jaws onto you...",self.bite.calcdamage(self.attack,defense))
+            enemyattackprompt("ENEMY latches its jaws onto you...",self.attacks[enemychoice].calcdamage(self.attack,defense))
         elif enemychoice == "STOMP":
-            enemyattackprompt("ENEMY raises its foot onto you...",self.stomp.calcdamage(self.attack,defense))
+            enemyattackprompt("ENEMY raises its foot onto you...",self.attacks[enemychoice].calcdamage(self.attack,defense))
         elif enemychoice == "SMASH":
-            enemyattackprompt("ENEMY charges up to ram into you...",self.smash.calcdamage(self.attack,defense))
+            enemyattackprompt("ENEMY charges up to ram into you...",self.attacks[enemychoice].calcdamage(self.attack,defense))
 
 player = PlayerCharacter()
 enemy = EnemyCharacter()
