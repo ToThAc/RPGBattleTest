@@ -79,48 +79,65 @@ class PlayerCharacter(Character):
         self.slash = PlayerAttack("SLASH")
         self.fireball = PlayerAttack("FIREBALL")
         self.icecrystal = PlayerAttack("ICE CRYSTAL")
-        self.attacks = ('SLASH', 'FIREBALL', 'ICE CRYSTAL')
+        self.attacks = ['SLASH', 'FIREBALL', 'ICE CRYSTAL']
     def taketurn(self,defense):
-        command = validinput(string,("ATTACK", "ITEMS", "FLEE"))
-        if command == "ATTACK":
-            attack = validinput(attackstring,self.attacks)
-            if attack == "SLASH":
-                playerattackprompt("You swung your blade...",self.slash.calcdamage(self.attack,defense))
-            elif attack == "FIREBALL":
-                playerattackprompt("You hurled a fireball...",self.fireball.calcdamage(self.attack,defense))
-            elif attack == "ICE CRYSTAL":
-                playerattackprompt("You chucked an icicle...",self.icecrystal.calcdamage(self.attack,defense))
-            return True
-        elif command == "ITEMS":
-            itemstring = f"Which item will you choose: HEART (×{itemlist.count('HEART')}), SUPER HEART (×{itemlist.count('SUPER HEART')}), ULTRA HEART (×{itemlist.count('ULTRA HEART')}), or MAX HEART (×{itemlist.count('MAX HEART')})? "
-            items = validinput(itemstring,itemmasterlist)
-            while items not in itemlist:
-                if items in itemmasterlist:
-                    print(itemrelinquish)
+        while True:
+            command = validinput(string,("ATTACK", "ITEMS", "FLEE"))
+            if command == "ATTACK":
+                attack = validinput(attackstring,self.attacks + ["BACK"])
+                if attack == "SLASH":
+                    playerattackprompt("You swung your blade...",self.slash.calcdamage(self.attack,defense))
+                    return True
+                elif attack == "FIREBALL":
+                    playerattackprompt("You hurled a fireball...",self.fireball.calcdamage(self.attack,defense))
+                    return True
+                elif attack == "ICE CRYSTAL":
+                    playerattackprompt("You chucked an icicle...",self.icecrystal.calcdamage(self.attack,defense))
+                    return True
+                elif attack == "BACK":
+                    continue
+            elif command == "ITEMS":
+                itemstring = f"Which item will you choose: HEART (×{itemlist.count('HEART')}), SUPER HEART (×{itemlist.count('SUPER HEART')}), ULTRA HEART (×{itemlist.count('ULTRA HEART')}), or MAX HEART (×{itemlist.count('MAX HEART')})? (You can also type \"BACK\" to go back.) "
+                items = validinput(itemstring,itemmasterlist + ["BACK"])
+                while items not in itemlist:
+                    if items in itemmasterlist:
+                        print(itemrelinquish)
+                        time.sleep(1)
+                        items = validinput(itemstring,itemmasterlist + ["BACK"])
+                    elif items == "BACK":
+                        break
+                    else:
+                        print(errormessage)
+                        time.sleep(1)
+                        items = validinput(itemstring,itemmasterlist + ["BACK"])
+                if items == "HEART":
+                    playerhealprompt(heart)
+                    itemlist.remove(items)
+                    return True
+                elif items == "SUPER HEART":
+                    playerhealprompt(superheart)
+                    itemlist.remove(items)
+                    return True
+                elif items == "ULTRA HEART":
+                    playerhealprompt(ultraheart)
+                    itemlist.remove(items)
+                    return True
+                elif items == "MAX HEART":
+                    playerhealprompt(maxheart)
+                    itemlist.remove(items)
+                    return True
+                elif items == "BACK":
+                    continue
+                if player.hitpoints > 1000:
+                    print("You're already at max HP!")
+                    player.hitpoints = 1000
                     time.sleep(1)
-                    items = validinput(itemstring,itemmasterlist)
-                else:
-                    print(errormessage)
-                    time.sleep(1)
-                    items = validinput(itemstring,itemmasterlist)
-            if items == "HEART":
-                playerhealprompt(heart)
-            elif items == "SUPER HEART":
-                playerhealprompt(superheart)
-            elif items == "ULTRA HEART":
-                playerhealprompt(ultraheart)
-            elif items == "MAX HEART":
-                playerhealprompt(maxheart)
-            if player.hitpoints > 1000:
-                print("You're already at max HP!")
-                player.hitpoints = 1000
+                    itemlist.remove(items)
+                    return True
+            elif command == "FLEE":
+                print("You ran away!")
                 time.sleep(1)
-            itemlist.remove(items)
-            return True
-        elif command == "FLEE":
-            print("You ran away!")
-            time.sleep(1)
-            return False
+                return False
 
 class EnemyCharacter(Character):
     def __init__(self):
@@ -143,7 +160,7 @@ class EnemyCharacter(Character):
 player = PlayerCharacter()
 enemy = EnemyCharacter()
 itemlist = ["HEART"] * 5 + ["SUPER HEART"] * 5 + ["ULTRA HEART"] * 5 + ["MAX HEART"] * 5
-itemmasterlist = ("HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART")
+itemmasterlist = ["HEART", "SUPER HEART", "ULTRA HEART", "MAX HEART"]
 
 def hpstatistics():
     print(f"ENEMY has {enemy.hitpoints}/1000 HP.")
@@ -178,7 +195,7 @@ hpstatistics()
 string = "Will you ATTACK, use ITEMS, or FLEE? "
 errormessage = "Command not recognized. Try again."
 itemrelinquish = "You're out of that particular item..."
-attackstring = "Which attack will it be: SLASH, FIREBALL, or ICE CRYSTAL? "
+attackstring = "Which attack will it be: SLASH, FIREBALL, or ICE CRYSTAL? (You can also type \"BACK\" to go back.) "
 while True:
     if not player.taketurn(enemy.defense):
         break
