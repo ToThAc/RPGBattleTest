@@ -30,7 +30,6 @@ def validinput(commandstring,validlist):
             x = input(commandstring)
     return x
 
-itemlist = ["HEART"] * 5 + ["SUPER HEART"] * 5 + ["ULTRA HEART"] * 5 + ["MAX HEART"] * 5
 itemmasterlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
 command = ''
 
@@ -74,6 +73,7 @@ class PlayerCharacter(Character):
     def __init__(self):
         super().__init__()
         self.attacks = {i:PlayerAttack(i) for i in ["SLASH", "FIREBALL", "ICE CRYSTAL"]}
+        self.items = [i for i in itemmasterlist] * 5
     def taketurn(self,defense):
         while True:
             command = validinput(string,("ATTACK", "ITEMS", "FLEE"))
@@ -91,9 +91,9 @@ class PlayerCharacter(Character):
                 elif attack == "BACK":
                     continue
             elif command == "ITEMS":
-                itemstring = f"Which item will you choose: HEART (×{itemlist.count('HEART')}), SUPER HEART (×{itemlist.count('SUPER HEART')}), ULTRA HEART (×{itemlist.count('ULTRA HEART')}), or MAX HEART (×{itemlist.count('MAX HEART')})? (You can also type \"BACK\" to go back.) "
+                itemstring = f"Which item will you choose: HEART (×{self.items.count('HEART')}), SUPER HEART (×{self.items.count('SUPER HEART')}), ULTRA HEART (×{self.items.count('ULTRA HEART')}), or MAX HEART (×{self.items.count('MAX HEART')})? (You can also type \"BACK\" to go back.) "
                 items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
-                while items not in itemlist:
+                while items not in self.items:
                     if items in itemmasterlist:
                         print(itemrelinquish)
                         time.sleep(1)
@@ -111,7 +111,7 @@ class PlayerCharacter(Character):
                     time.sleep(1)
                     continue
                 playerhealprompt(itemmasterlist[items])
-                itemlist.remove(items)
+                self.items.remove(items)
                 player.hitpoints = min(player.hitpoints,1000)
                 return True
             elif command == "FLEE":
