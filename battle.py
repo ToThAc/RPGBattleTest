@@ -53,42 +53,37 @@ def enemyattackprompt(promptstring,damagedealt):
     time.sleep(1)
 
 class Attack():
-    def __init__(self,name):
+    def __init__(self,name,quote):
         self.name = name
+        self.quote = quote
         self.constant = 0
     def calcdamage(self,attacker,defender):
         return int((0.1 * (attacker - defender) * self.constant) + 0.5)
 
 class PlayerAttack(Attack):
-    def __init__(self,name):
-        super().__init__(name)
+    def __init__(self,name,quote):
+        super().__init__(name,quote)
         self.constant = random.randint(60, 100)
 
 class EnemyAttack(Attack):
-    def __init__(self,name):
-        super().__init__(name)
+    def __init__(self,name,quote):
+        super().__init__(name,quote)
         self.constant = random.randint(30, 70)
 
 class PlayerCharacter(Character):
     def __init__(self):
         super().__init__()
-        self.attacks = {i:PlayerAttack(i) for i in ["SLASH", "FIREBALL", "ICE CRYSTAL"]}
+        self.attacks = {x:PlayerAttack(x,y) for (x,y) in [["SLASH","You swung your blade..."], ["FIREBALL","You hurled a fireball..."], ["ICE CRYSTAL","You chucked an icicle..."]]}
         self.items = [i for i in itemmasterlist] * 5
     def taketurn(self,defense):
         while True:
             command = validinput(string,("ATTACK", "ITEMS", "FLEE"))
             if command == "ATTACK":
                 attack = validinput(attackstring,list(self.attacks.keys()) + ["BACK"])
-                if attack == "SLASH":
-                    playerattackprompt("You swung your blade...",self.attacks[attack].calcdamage(self.attack,defense))
+                if attack in self.attacks:
+                    playerattackprompt(self.attacks[attack].quote,self.attacks[attack].calcdamage(self.attack,defense))
                     return True
-                elif attack == "FIREBALL":
-                    playerattackprompt("You hurled a fireball...",self.attacks[attack].calcdamage(self.attack,defense))
-                    return True
-                elif attack == "ICE CRYSTAL":
-                    playerattackprompt("You chucked an icicle...",self.attacks[attack].calcdamage(self.attack,defense))
-                    return True
-                elif attack == "BACK":
+                if attack == "BACK":
                     continue
             elif command == "ITEMS":
                 itemstring = f"Which item will you choose: HEART (×{self.items.count('HEART')}), SUPER HEART (×{self.items.count('SUPER HEART')}), ULTRA HEART (×{self.items.count('ULTRA HEART')}), or MAX HEART (×{self.items.count('MAX HEART')})? (You can also type \"BACK\" to go back.) "
@@ -122,17 +117,13 @@ class PlayerCharacter(Character):
 class EnemyCharacter(Character):
     def __init__(self):
         super().__init__()
-        self.attacks = {i:EnemyAttack(i) for i in ["BITE", "STOMP", "SMASH"]}
+        self.attacks = {x:EnemyAttack(x,y) for (x,y) in [["BITE","ENEMY latches its jaws onto you..."], ["STOMP","ENEMY raises its foot onto you..."], ["SMASH","ENEMY charges up to ram into you..."]]}
     def taketurn(self,defense):
         print("ENEMY readies an attack!")
         time.sleep(1)
         enemychoice = random.choice(list(self.attacks.keys()))
-        if enemychoice == "BITE":
-            enemyattackprompt("ENEMY latches its jaws onto you...",self.attacks[enemychoice].calcdamage(self.attack,defense))
-        elif enemychoice == "STOMP":
-            enemyattackprompt("ENEMY raises its foot onto you...",self.attacks[enemychoice].calcdamage(self.attack,defense))
-        elif enemychoice == "SMASH":
-            enemyattackprompt("ENEMY charges up to ram into you...",self.attacks[enemychoice].calcdamage(self.attack,defense))
+        if enemychoice in self.attacks:
+            enemyattackprompt(self.attacks[enemychoice].quote,self.attacks[enemychoice].calcdamage(self.attack,defense))
 
 player = PlayerCharacter()
 enemy = EnemyCharacter()
