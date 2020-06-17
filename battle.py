@@ -8,14 +8,14 @@ class Character:
 		self.attack = random.randint(20,30)
 		self.defense = random.randint(10,20)
 		self.attacks = set()
-		self.items = set()
+        #self.itemlist = set()
 		self.identifier = identifier
 	def damage(self,hp):
 		self.hitpoints -= hp
 	def heal(self,h):
 		self.hitpoints += h.hp
-	def additem(self,item):
-		self.items.add(item)
+	#def additem(self,item):
+		#self.itemlist.add(item)
 	def taketurn(self):
 		pass
 
@@ -72,10 +72,10 @@ class EnemyAttack(Attack):
         self.constant = random.randint(30, 70)
 
 class PlayerCharacter(Character):
+    itemlist = [i for i in itemmasterlist] * 5
     def __init__(self,identifier):
         super().__init__(identifier)
         self.attacks = {x:PlayerAttack(x,y) for (x,y) in [["SLASH","You swung your blade..."], ["FIREBALL","You hurled a fireball..."], ["ICE CRYSTAL","You chucked an icicle..."]]}
-        self.items = [i for i in itemmasterlist] * 5
     def taketurn(self,defense):
         while True:
             string = f"Will PLAYER {self.identifier} ATTACK, use ITEMS, or FLEE? "
@@ -94,9 +94,9 @@ class PlayerCharacter(Character):
                 if attack == "BACK":
                     continue
             elif command == "ITEMS":
-                itemstring = f"Which item will PLAYER {self.identifier} choose: HEART (×{self.items.count('HEART')}), SUPER HEART (×{self.items.count('SUPER HEART')}), ULTRA HEART (×{self.items.count('ULTRA HEART')}), or MAX HEART (×{self.items.count('MAX HEART')})? (You can also type \"BACK\" to go back.) "
+                itemstring = f"Which item will PLAYER {self.identifier} choose: HEART (×{self.itemlist.count('HEART')}), SUPER HEART (×{self.itemlist.count('SUPER HEART')}), ULTRA HEART (×{self.itemlist.count('ULTRA HEART')}), or MAX HEART (×{self.itemlist.count('MAX HEART')})? (You can also type \"BACK\" to go back.) "
                 items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
-                while items not in self.items:
+                while items not in self.itemlist:
                     if items in itemmasterlist:
                         print(itemrelinquish)
                         time.sleep(1)
@@ -114,7 +114,7 @@ class PlayerCharacter(Character):
                     time.sleep(1)
                     continue
                 playerhealprompt(itemmasterlist[items])
-                self.items.remove(items)
+                self.itemlist.remove(items)
                 player.hitpoints = min(player.hitpoints,1000)
                 return True
             elif command == "FLEE":
