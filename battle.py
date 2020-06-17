@@ -24,11 +24,11 @@ class Heart:
 		self.hp = hp
 
 def validinput(commandstring,validlist):
-    x = input(commandstring)
+    x = input(commandstring).upper()
     while x not in validlist:
             print(errormessage)
             time.sleep(1)
-            x = input(commandstring)
+            x = input(commandstring).upper()
     return x
 
 itemmasterlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
