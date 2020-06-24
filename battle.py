@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import random
-import time
+from time import sleep
 
 class Character:
 	def __init__(self,identifier):
@@ -27,7 +27,7 @@ def validinput(commandstring,validlist):
     x = input(commandstring).upper()
     while x not in validlist:
             print(errormessage)
-            time.sleep(1)
+            sleep(1)
             x = input(commandstring).upper()
     return x
 
@@ -36,22 +36,22 @@ command = ''
 
 def playerattackprompt(promptstring,damagedealt,enemy):
     print(promptstring)
-    time.sleep(2)
+    sleep(2)
     print("...and inflicted", damagedealt, f"damage to ENEMY {enemy.identifier}!")
     enemy.damage(damagedealt)
-    time.sleep(1)
+    sleep(1)
 
 def playerhealprompt(item):
     player.heal(item)
     print(f"You restored {item.hp} HP!")
-    time.sleep(1)
+    sleep(1)
 
 def enemyattackprompt(promptstring,damagedealt,player):
     print(promptstring)
-    time.sleep(2)
+    sleep(2)
     print(f"...and thus PLAYER {player.identifier} received", damagedealt, "damage!")
     player.damage(damagedealt)
-    time.sleep(1)
+    sleep(1)
 
 class Attack():
     def __init__(self,name,quote):
@@ -99,19 +99,19 @@ class PlayerCharacter(Character):
                 while items not in self.itemlist:
                     if items in itemmasterlist:
                         print(itemrelinquish)
-                        time.sleep(1)
+                        sleep(1)
                         items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
                     elif items == "BACK":
                         break
                     else:
                         print(errormessage)
-                        time.sleep(1)
+                        sleep(1)
                         items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
                 if items == "BACK":
                     continue
                 if player.hitpoints == 1000:
                     print("You're already at max HP!")
-                    time.sleep(1)
+                    sleep(1)
                     continue
                 playerhealprompt(itemmasterlist[items])
                 self.itemlist.remove(items)
@@ -119,7 +119,7 @@ class PlayerCharacter(Character):
                 return True
             elif command == "FLEE":
                 print("You ran away!")
-                time.sleep(1)
+                sleep(1)
                 return False
 
 class EnemyCharacter(Character):
@@ -129,7 +129,7 @@ class EnemyCharacter(Character):
     def taketurn(self,defense):
         enemystring = f"ENEMY {self.identifier} readies an attack!"
         print(enemystring)
-        time.sleep(1)
+        sleep(1)
         enemychoice = random.choice(list(self.attacks.keys()))
         if enemychoice in self.attacks:
             player = random.choice(players)
@@ -138,37 +138,37 @@ class EnemyCharacter(Character):
 def hpstatistics(enemies,players):
     for enemy in enemies:
         print(f"ENEMY {enemy.identifier} has {enemy.hitpoints}/1000 HP.")
-        time.sleep(1)
+        sleep(1)
     for player in players:
         print(f"PLAYER {player.identifier} currently has {player.hitpoints}/1000 HP.")
-        time.sleep(1)
+        sleep(1)
 
 def defeatstate():
     for enemy in enemies:
         if enemy.hitpoints <= 0:
             enemies.remove(enemy)
             print(f"ENEMY {enemy.identifier} is defeated!")
-            time.sleep(1)
+            sleep(1)
     for player in players:
         if player.hitpoints <= 0:
             players.remove(player)
             print(f"PLAYER {player.identifier} is defeated!")
-            time.sleep(1)
+            sleep(1)
     if len(enemies) == 0:
         print("All ENEMIES defeated!")
-        time.sleep(1)
+        sleep(1)
         print("YOU WIN!")
-        time.sleep(2)
+        sleep(2)
         print("Your team obtained 43 EXP.")
-        time.sleep(1)
+        sleep(1)
         return True
     elif len(players) == 0:
         print("Your team was defeated!")
-        time.sleep(1)
+        sleep(1)
         print("Your team lost the battle...")
-        time.sleep(2)
+        sleep(2)
         print("GAME OVER")
-        time.sleep(1)
+        sleep(1)
         return True
     else:
         return False
@@ -178,7 +178,7 @@ quantity = int(input("How many players? "))
 print("ENEMY team attacks!")
 players = [PlayerCharacter(i+1) for i in range(quantity)]
 enemies = [EnemyCharacter(i+1) for i in range(quantity)]
-time.sleep(1)
+sleep(1)
 hpstatistics(enemies,players)
 errormessage = "Command not recognized. Try again."
 itemrelinquish = "You're out of that particular item..."
