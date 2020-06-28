@@ -27,7 +27,7 @@ def validinput(commandstring,validlist):
 	x = input(commandstring).upper()
 	while x not in validlist:
 			print(errormessage)
-			#sleep(1)
+			sleep(1)
 			x = input(commandstring).upper()
 	return x
 
@@ -35,17 +35,17 @@ itemmasterlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90
 
 def playerattackprompt(promptstring,damagedealt,enemy):
 	print(promptstring)
-	#sleep(2)
+	sleep(2)
 	print("...and inflicted", damagedealt, f"damage to ENEMY {enemy.identifier}!")
 	enemy.damage(damagedealt)
-	#sleep(1)
+	sleep(1)
 
 def enemyattackprompt(promptstring,damagedealt,player):
 	print(promptstring)
-	#sleep(2)
+	sleep(2)
 	print(f"...and thus PLAYER {player.identifier} received", damagedealt, "damage!")
 	player.damage(damagedealt)
-	#sleep(1)
+	sleep(1)
 
 class Attack():
 	def __init__(self,name,quote):
@@ -93,29 +93,29 @@ class PlayerCharacter(Character):
 				while items not in self.itemlist:
 					if items in itemmasterlist:
 						print(itemrelinquish)
-						#sleep(1)
+						sleep(1)
 						items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
 					elif items == "BACK":
 						break
 					else:
 						print(errormessage)
-						#sleep(1)
+						sleep(1)
 						items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
 				if items == "BACK":
 					continue
 				if self.hitpoints == 1000:
 					print("You're already at max HP!")
-					#sleep(1)
+					sleep(1)
 					continue
 				self.heal(itemmasterlist[items])
 				print(f"You restored {itemmasterlist[items].hp} HP!")
-				#sleep(1)
+				sleep(1)
 				self.itemlist.remove(items)
 				self.hitpoints = min(self.hitpoints,1000)
 				return True
 			elif command == "FLEE":
 				print("You ran away!")
-				#sleep(1)
+				sleep(1)
 				return False
 
 class EnemyCharacter(Character):
@@ -125,7 +125,7 @@ class EnemyCharacter(Character):
 	def taketurn(self,defense):
 		enemystring = f"ENEMY {self.identifier} readies an attack!"
 		print(enemystring)
-		#sleep(1)
+		sleep(1)
 		enemychoice = random.choice(list(self.attacks.keys()))
 		if enemychoice in self.attacks:
 			player = random.choice(players)
@@ -139,7 +139,7 @@ def hpstatistics():
 		else:
 			beligerent = "ENEMY"
 		print(f"{beligerent} {character.identifier} has {character.hitpoints}/1000 HP.")
-		#sleep(1)
+		sleep(1)
 
 def defeatstate():
 	for character in characters:
@@ -154,22 +154,22 @@ def defeatstate():
 			else:
 				enemies.remove(character)
 			print(f"{beligerent} {character.identifier} is defeated!")
-			#sleep(1)
+			sleep(1)
 	if len(enemies) == 0:
 		print("All ENEMIES defeated!")
-		#sleep(1)
+		sleep(1)
 		print("YOU WIN!")
-		#sleep(2)
+		sleep(2)
 		print("Your team obtained 43 EXP.")
-		#sleep(1)
+		sleep(1)
 		return True
 	elif len(players) == 0:
 		print("Your team was defeated!")
-		#sleep(1)
+		sleep(1)
 		print("Your team lost the battle...")
-		#sleep(2)
+		sleep(2)
 		print("GAME OVER")
-		#sleep(1)
+		sleep(1)
 		return True
 	else:
 		return False
@@ -182,7 +182,7 @@ players = [PlayerCharacter(i+1) for i in range(quantity)]
 enemies = [EnemyCharacter(i+1) for i in range(quantity)]
 characters = players + enemies
 random.shuffle(characters)
-#sleep(1)
+sleep(1)
 hpstatistics()
 errormessage = "Command not recognized. Try again."
 itemrelinquish = "You're out of that particular item..."
