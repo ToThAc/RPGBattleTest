@@ -33,20 +33,6 @@ def validinput(commandstring,validlist):
 
 itemmasterlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
 
-def playerattackprompt(promptstring,damagedealt,enemy):
-	print(promptstring)
-	sleep(2)
-	print("...and inflicted", damagedealt, f"damage to ENEMY {enemy.identifier}!")
-	enemy.damage(damagedealt)
-	sleep(1)
-
-def enemyattackprompt(promptstring,damagedealt,player):
-	print(promptstring)
-	sleep(2)
-	print(f"...and thus PLAYER {player.identifier} received", damagedealt, "damage!")
-	player.damage(damagedealt)
-	sleep(1)
-
 class Attack():
 	def __init__(self,name,quote):
 		self.name = name
@@ -69,7 +55,7 @@ class PlayerCharacter(Character):
 	itemlist = [i for i in itemmasterlist] * 5
 	def __init__(self,identifier):
 		super().__init__(identifier)
-		self.attacks = {x:PlayerAttack(x,y) for (x,y) in [["SLASH","You swung your blade..."], ["FIREBALL","You hurled a fireball..."], ["ICE CRYSTAL","You chucked an icicle..."]]}
+		self.attacks = {x:PlayerAttack(x,y) for (x,y) in [["SLASH",f"PLAYER {self.identifier} swung their blade..."], ["FIREBALL",f"PLAYER {self.identifier} hurled a fireball..."], ["ICE CRYSTAL",f"PLAYER {self.identifier} chucked an icicle..."]]}
 	def taketurn(self,defense):
 		while True:
 			string = f"Will PLAYER {self.identifier} ATTACK, use ITEMS, or FLEE? "
@@ -86,7 +72,11 @@ class PlayerCharacter(Character):
 						for enemy in enemies:
 							if int(choice) == enemy.identifier:
 								break
-					playerattackprompt(self.attacks[attack].quote,self.attacks[attack].calcdamage(self.attack,enemy.defense),enemy)
+					print(self.attacks[attack].quote)
+					sleep(2)
+					print("...and inflicted", self.attacks[attack].calcdamage(self.attack,enemy.defense), f"damage to ENEMY {enemy.identifier}!")
+					enemy.damage(self.attacks[attack].calcdamage(self.attack,enemy.defense))
+					sleep(1)
 					return True
 				if attack == "BACK":
 					continue
@@ -124,7 +114,7 @@ class PlayerCharacter(Character):
 class EnemyCharacter(Character):
 	def __init__(self,identifier):
 		super().__init__(identifier)
-		self.attacks = {x:EnemyAttack(x,y) for (x,y) in [["BITE","ENEMY latches its jaws onto you..."], ["STOMP","ENEMY raises its foot onto you..."], ["SMASH","ENEMY charges up to ram into you..."]]}
+		self.attacks = {x:EnemyAttack(x,y) for (x,y) in [["BITE",f"ENEMY {self.identifier} opens its jaws..."], ["STOMP",f"ENEMY {self.identifier} raises its foot..."], ["SMASH",f"ENEMY {self.identifier} charges up to ram into your team..."]]}
 	def taketurn(self,defense):
 		enemystring = f"ENEMY {self.identifier} readies an attack!"
 		print(enemystring)
@@ -132,7 +122,11 @@ class EnemyCharacter(Character):
 		enemychoice = random.choice(list(self.attacks.keys()))
 		if enemychoice in self.attacks:
 			player = random.choice(players)
-			enemyattackprompt(self.attacks[enemychoice].quote,self.attacks[enemychoice].calcdamage(self.attack,player.defense),player)
+			print(self.attacks[enemychoice].quote)
+			sleep(2)
+			print(f"...and thus PLAYER {player.identifier} received", self.attacks[enemychoice].calcdamage(self.attack,player.defense), "damage!")
+			player.damage(self.attacks[enemychoice].calcdamage(self.attack,player.defense))
+			sleep(1)
 		return True
 
 def hpstatistics():
