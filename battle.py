@@ -77,12 +77,15 @@ class PlayerCharacter(Character):
 			if command == "ATTACK":
 				attack = validinput(attackstring,list(self.attacks.keys()) + ["BACK"])
 				if attack in self.attacks:
-					choice = validinput(whichenemy,[str(i.identifier) for i in enemies] + ["BACK"])
-					if choice == "BACK":
-						continue
-					for enemy in enemies:
-						if int(choice) == enemy.identifier:
-							break
+					if len(enemies) == 1:
+						enemy = enemies[0]
+					else:
+						choice = validinput(whichenemy,[str(i.identifier) for i in enemies] + ["BACK"])
+						if choice == "BACK":
+							continue
+						for enemy in enemies:
+							if int(choice) == enemy.identifier:
+								break
 					playerattackprompt(self.attacks[attack].quote,self.attacks[attack].calcdamage(self.attack,enemy.defense),enemy)
 					return True
 				if attack == "BACK":
