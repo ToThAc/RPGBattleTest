@@ -31,6 +31,17 @@ def validinput(commandstring,validlist):
 			x = input(commandstring).upper()
 	return x
 
+#def playerchoice(beligerents,beligerent,choiceprompt,whichprompt):
+	#if len(beligerents) == 1:
+		#beligerent = beligerents[0]
+	#else:
+		#choiceprompt = validinput(whichprompt,[str(i.identifier) for i in beligerents] + ["BACK"])
+		#if choiceprompt == "BACK":
+			#return False
+		#for beligerent in beligerents:
+			#if int(choiceprompt) == beligerent.identifier:
+				#break
+
 itemmasterlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
 
 class Attack():
@@ -66,11 +77,11 @@ class PlayerCharacter(Character):
 					if len(enemies) == 1:
 						enemy = enemies[0]
 					else:
-						choice = validinput(whichenemy,[str(i.identifier) for i in enemies] + ["BACK"])
-						if choice == "BACK":
+						attackchoice = validinput(whichenemy,[str(i.identifier) for i in enemies] + ["BACK"])
+						if attackchoice == "BACK":
 							continue
 						for enemy in enemies:
-							if int(choice) == enemy.identifier:
+							if int(attackchoice) == enemy.identifier:
 								break
 					print(self.attacks[attack].quote)
 					sleep(2)
@@ -82,29 +93,38 @@ class PlayerCharacter(Character):
 					continue
 			elif command == "ITEMS":
 				itemstring = f"Which item will PLAYER {self.identifier} choose: HEART (×{self.itemlist.count('HEART')}), SUPER HEART (×{self.itemlist.count('SUPER HEART')}), ULTRA HEART (×{self.itemlist.count('ULTRA HEART')}), or MAX HEART (×{self.itemlist.count('MAX HEART')})? (You can also type \"BACK\" to go back.) "
-				items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
-				while items not in self.itemlist:
-					if items in itemmasterlist:
+				item = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
+				while item not in self.itemlist:
+					if item in itemmasterlist:
 						print(itemrelinquish)
 						sleep(1)
-						items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
-					elif items == "BACK":
+						item = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
+					elif item == "BACK":
 						break
 					else:
 						print(errormessage)
 						sleep(1)
-						items = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
-				if items == "BACK":
+						item = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
+				if item == "BACK":
 					continue
-				if self.hitpoints == 1000:
-					print("You're already at max HP!")
+				if len(players) == 1:
+					player = players[0]
+				else:
+					itemchoice = validinput(whichplayer,[str(i.identifier) for i in players] + ["BACK"])
+					if itemchoice == "BACK":
+						continue
+					for player in players:
+						if int(itemchoice) == player.identifier:
+							break
+				if player.hitpoints == 1000:
+					print(f"PLAYER {player.identifier} is already at max HP!")
 					sleep(1)
 					continue
-				self.heal(itemmasterlist[items])
-				print(f"You restored {itemmasterlist[items].hp} HP!")
+				player.heal(itemmasterlist[item])
+				print(f"PLAYER {player.identifier} restored {itemmasterlist[item].hp} HP!")
 				sleep(1)
-				self.itemlist.remove(items)
-				self.hitpoints = min(self.hitpoints,1000)
+				self.itemlist.remove(item)
+				player.hitpoints = min(player.hitpoints,1000)
 				return True
 			elif command == "FLEE":
 				print("You ran away!")
@@ -185,6 +205,7 @@ errormessage = "Command not recognized. Try again."
 itemrelinquish = "You're out of that particular item..."
 attackstring = "Which attack will it be: SLASH, FIREBALL, or ICE CRYSTAL? (You can also type \"BACK\" to go back.) "
 whichenemy = "Which enemy is to be targeted? (You can also type \"BACK\" to go back.) "
+whichplayer = "Which player should use this item? (You can also type \"BACK\" to go back.) "
 while len(players) != 0 and len(enemies) != 0:
 	for character in characters:
 		if character in players:
