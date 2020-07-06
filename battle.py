@@ -31,16 +31,17 @@ def validinput(commandstring,validlist):
 			x = input(commandstring).upper()
 	return x
 
-#def playerchoice(beligerents,beligerent,choiceprompt,whichprompt):
-	#if len(beligerents) == 1:
-		#beligerent = beligerents[0]
-	#else:
-		#choiceprompt = validinput(whichprompt,[str(i.identifier) for i in beligerents] + ["BACK"])
-		#if choiceprompt == "BACK":
-			#return False
-		#for beligerent in beligerents:
-			#if int(choiceprompt) == beligerent.identifier:
-				#break
+def playerchoice(beligerents,whichprompt):
+	if len(beligerents) == 1:
+		beligerent = beligerents[0]
+	else:
+		choiceprompt = validinput(whichprompt,[str(i.identifier) for i in beligerents] + ["BACK"])
+		if choiceprompt == "BACK":
+			return False
+		for beligerent in beligerents:
+			if int(choiceprompt) == beligerent.identifier:
+				break
+	return beligerent
 
 itemmasterlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
 
@@ -74,15 +75,9 @@ class PlayerCharacter(Character):
 			if command == "ATTACK":
 				attack = validinput(attackstring,list(self.attacks.keys()) + ["BACK"])
 				if attack in self.attacks:
-					if len(enemies) == 1:
-						enemy = enemies[0]
-					else:
-						attackchoice = validinput(whichenemy,[str(i.identifier) for i in enemies] + ["BACK"])
-						if attackchoice == "BACK":
-							continue
-						for enemy in enemies:
-							if int(attackchoice) == enemy.identifier:
-								break
+					enemy = playerchoice(enemies,whichenemy)
+					if not enemy:
+						continue
 					print(self.attacks[attack].quote)
 					sleep(2)
 					print("...and inflicted", self.attacks[attack].calcdamage(self.attack,enemy.defense), f"damage to ENEMY {enemy.identifier}!")
@@ -107,15 +102,9 @@ class PlayerCharacter(Character):
 						item = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
 				if item == "BACK":
 					continue
-				if len(players) == 1:
-					player = players[0]
-				else:
-					itemchoice = validinput(whichplayer,[str(i.identifier) for i in players] + ["BACK"])
-					if itemchoice == "BACK":
-						continue
-					for player in players:
-						if int(itemchoice) == player.identifier:
-							break
+				player = playerchoice(players,whichplayer)
+				if not player:
+					continue
 				if player.hitpoints == 1000:
 					print(f"PLAYER {player.identifier} is already at max HP!")
 					sleep(1)
