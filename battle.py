@@ -23,6 +23,10 @@ class Heart:
 	def __init__(self,hp=30):
 		self.hp = hp
 
+class Revive:
+	def __init__(self,hp=1000):
+		self.hp = hp
+
 def validinput(commandstring,validlist):
 	x = input(commandstring).upper()
 	while x not in validlist:
@@ -43,9 +47,11 @@ def playerchoice(beligerents,whichprompt):
 				break
 	return beligerent
 
-itemmasterlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
+heartlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
+revivelist = {"REVIVE":Revive(500),"DELUXE REVIVE":Revive()}
+itemmasterlist = {**heartlist, **revivelist}
 
-class Attack():
+class Attack:
 	def __init__(self,name,quote):
 		self.name = name
 		self.quote = quote
@@ -87,7 +93,7 @@ class PlayerCharacter(Character):
 				if attack == "BACK":
 					continue
 			elif command == "ITEMS":
-				itemstring = f"Which item will PLAYER {self.identifier} choose: HEART (×{self.itemlist.count('HEART')}), SUPER HEART (×{self.itemlist.count('SUPER HEART')}), ULTRA HEART (×{self.itemlist.count('ULTRA HEART')}), or MAX HEART (×{self.itemlist.count('MAX HEART')})? (You can also type \"BACK\" to go back.) "
+				itemstring = f"Which item will PLAYER {self.identifier} choose: HEART (×{self.itemlist.count('HEART')}), SUPER HEART (×{self.itemlist.count('SUPER HEART')}), ULTRA HEART (×{self.itemlist.count('ULTRA HEART')}), MAX HEART (×{self.itemlist.count('MAX HEART')}), REVIVE (×{self.itemlist.count('REVIVE')}), or DELUXE REVIVE (×{self.itemlist.count('DELUXE REVIVE')})? (You can also type \"BACK\" to go back.) "
 				item = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
 				while item not in self.itemlist:
 					if item in itemmasterlist:
@@ -102,18 +108,30 @@ class PlayerCharacter(Character):
 						item = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
 				if item == "BACK":
 					continue
-				player = playerchoice(players,whichplayer)
-				if not player:
-					continue
-				if player.hitpoints == 1000:
-					print(f"PLAYER {player.identifier} is already at max HP!")
+				if item in heartlist:
+					player = playerchoice(players,whichplayer)
+					if not player:
+						continue
+					if player.hitpoints == 1000:
+						print(f"PLAYER {player.identifier} is already at max HP!")
+						sleep(1)
+						continue
+					player.heal(itemmasterlist[item])
+					print(f"PLAYER {player.identifier} restored {itemmasterlist[item].hp} HP!")
 					sleep(1)
-					continue
-				player.heal(itemmasterlist[item])
-				print(f"PLAYER {player.identifier} restored {itemmasterlist[item].hp} HP!")
-				sleep(1)
-				self.itemlist.remove(item)
-				player.hitpoints = min(player.hitpoints,1000)
+					self.itemlist.remove(item)
+					player.hitpoints = min(player.hitpoints,1000)
+				elif item in revivelist:
+					player = playerchoice(downedplayers,whichplayer)
+					if not player:
+						continue
+					player.heal(itemmasterlist[item])
+					print(f"PLAYER {player.identifier} was revived with {itemmasterlist[item].hp} HP!")
+					sleep(1)
+					self.itemlist.remove(item)
+					players.append(player)
+					characters.append(player)
+					downedplayers.remove(player)
 				return True
 			elif command == "FLEE":
 				print("You ran away!")
@@ -156,11 +174,13 @@ def defeatstate():
 		if character.hitpoints <= 0:
 			characters.remove(character)
 			if character in players:
+				downedplayers.append(character)
 				players.remove(character)
 			else:
 				enemies.remove(character)
 			print(f"{beligerent} {character.identifier} is defeated!")
 			sleep(1)
+			character.hitpoints == 0
 	if len(enemies) == 0:
 		print("All ENEMIES defeated!")
 		sleep(1)
@@ -187,7 +207,12 @@ print("ENEMY team attacks!")
 players = [PlayerCharacter(i+1) for i in range(quantity)]
 enemies = [EnemyCharacter(i+1) for i in range(quantity)]
 characters = players + enemies
+downedplayers = []
 random.shuffle(characters)
+speed = 0
+for character in characters:
+	character.speed = speed
+	speed += 1
 sleep(1)
 hpstatistics()
 errormessage = "Command not recognized. Try again."
