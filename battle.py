@@ -119,7 +119,6 @@ class PlayerCharacter(Character):
 					player.heal(itemmasterlist[item])
 					print(f"PLAYER {player.identifier} restored {itemmasterlist[item].hp} HP!")
 					sleep(1)
-					self.itemlist.remove(item)
 					player.hitpoints = min(player.hitpoints,1000)
 				elif item in revivelist:
 					player = playerchoice(downedplayers,whichplayer)
@@ -128,10 +127,10 @@ class PlayerCharacter(Character):
 					player.heal(itemmasterlist[item])
 					print(f"PLAYER {player.identifier} was revived with {itemmasterlist[item].hp} HP!")
 					sleep(1)
-					self.itemlist.remove(item)
 					players.append(player)
 					characters.append(player)
 					downedplayers.remove(player)
+				self.itemlist.remove(item)
 				return True
 			elif command == "FLEE":
 				print("You ran away!")
