@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 import random
 from time import sleep
+from tkinter import *
+from tkinter import ttk
+import tklayout as tkb
 
 class Character:
 	def __init__(self,identifier):
@@ -50,6 +53,84 @@ def playerchoice(beligerents,whichprompt):
 heartlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
 revivelist = {"REVIVE":Revive(500),"DELUXE REVIVE":Revive()}
 itemmasterlist = {**heartlist, **revivelist}
+
+def mainapp():
+	def build_attack(parent):
+		w = Button(parent,text="ATTACK",justify=CENTER,fg="deepskyblue")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_items(parent):
+		w = Button(parent,text="ITEMS",justify=CENTER,fg="gold")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_flee(parent):
+		w = Button(parent,text="FLEE",justify=CENTER,fg="red")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	lo = tkb.AppLayout()
+	config_opts = {"borderwidth":3,"relief":GROOVE}
+	grid_opts = {"sticky": NSEW}
+	aif = lo.row_elements(["A","I","F"],config_opts,grid_opts)
+	app = lo.column_elements([aif,hpCount],config_opts,grid_opts)
+	root = Tk()
+	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
+	lo.build_elements({"A":build_attack,"I":build_items,"F":build_flee})
+	root.mainloop()
+
+def attackapp():
+	def build_slash(parent):
+		w = Button(parent,text="SLASH",justify=CENTER,fg="silver")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_fireball(parent):
+		w = Button(parent,text="FIREBALL",justify=CENTER,fg="orangered")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_icecrystal(parent):
+		w = Button(parent,text="ICE CRYSTAL",justify=CENTER,fg="paleturquoise")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_back(parent):
+		w = Button(parent,text="BACK",justify=CENTER,fg="black")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	lo = tkb.AppLayout()
+	config_opts = {"borderwidth":3,"relief":GROOVE}
+	grid_opts = {"sticky": NSEW}
+	sfi = lo.row_elements(["SL","FB","IC"],config_opts,grid_opts)
+	sfib = lo.column_elements([sfi,"B"],config_opts,grid_opts)
+	app = lo.column_elements([sfib,hpCount],config_opts,grid_opts)
+	root = Tk()
+	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
+	lo.build_elements({"SL":build_slash,"FB":build_fireball,"IC":build_icecrystal,"B":build_back})
+	root.mainloop()
+
+def itemsapp():
+	def build_heart(parent):
+		w = Button(parent,text="HEART",justify=CENTER,fg="magenta")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_superheart(parent):
+		w = Button(parent,text="SUPER HEART",justify=CENTER,fg="magenta")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_ultraheart(parent):
+		w = Button(parent,text="ULTRA HEART",justify=CENTER,fg="magenta")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_maxheart(parent):
+		w = Button(parent,text="MAX HEART",justify=CENTER,fg="magenta")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_revive(parent):
+		w = Button(parent,text="REVIVE",justify=CENTER,fg="darkorchid")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_deluxerevive(parent):
+		w = Button(parent,text="DELUXE REVIVE",justify=CENTER,fg="darkorchid")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	def build_back(parent):
+		w = Button(parent,text="BACK",justify=CENTER,fg="black")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	lo = tkb.AppLayout()
+	config_opts = {"borderwidth":3,"relief":GROOVE}
+	grid_opts = {"sticky": NSEW}
+	hsum = lo.row_elements(["H","SH","UH","MH"],config_opts,grid_opts)
+	rd = lo.row_elements(["R","DR"],config_opts,grid_opts)
+	hrb = lo.column_elements([hsum,rd,"B"],config_opts,grid_opts)
+	app = lo.column_elements([hrb,hpCount],config_opts,grid_opts)
+	root = Tk()
+	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
+	lo.build_elements({"H":build_heart,"SH":build_superheart,"UH":build_ultraheart,"MH":build_maxheart,"R":build_revive,"DR":build_deluxerevive,"B":build_back})
+	root.mainloop()
 
 class Attack:
 	def __init__(self,name,quote):
@@ -155,14 +236,28 @@ class EnemyCharacter(Character):
 			sleep(1)
 		return True
 
-def hpstatistics():
-	for character in characters:
-		if character in players:
-			beligerent = "PLAYER"
-		else:
-			beligerent = "ENEMY"
-		print(f"{beligerent} {character.identifier} has {character.hitpoints}/1000 HP.")
-		sleep(1)
+class hpCount(Frame):
+	def createWidget(self,beligerent,character):
+		self.LABEL = Label(self)
+		self.LABEL["text"] = f"{beligerent} {character.identifier}"
+		self.LABEL.pack({"side": "left"})
+		self.hp = ttk.Progressbar(self)
+		self.hp["orient"] = "horizontal"
+		#self.hp["length"] = "1000"
+		self.hp["mode"] = "determinate"
+		self.hp["maximum"] = "1000"
+		self.hp["value"] = character.hitpoints
+		self.hp.pack({"side": "top"})
+	
+	def __init__(self, master=None):
+		Frame.__init__(self, master)
+		for character in characters:
+			if character in players:
+				beligerent = "PLAYER"
+			else:
+				beligerent = "ENEMY"
+			self.pack()
+			self.createWidget(beligerent,character)
 
 def defeatstate():
 	for character in characters:
@@ -199,12 +294,36 @@ def defeatstate():
 	else:
 		return False
 
+class PlayerCount(Frame):
+	def createWidgets(self):
+		self.LABEL = Label(self)
+		self.LABEL["text"] = "How many players?"
+		self.LABEL.pack({"side": "left"})
+		self.COUNT = Spinbox(self)
+		self.COUNT["to"] = "5"
+		self.COUNT["from"] = "1"
+		self.COUNT["increment"] = "1"
+		self.COUNT.pack({"side": "left"})
+		self.START = Button(self)
+		self.START["text"] = "START",
+		self.START["command"] = self.quit
+		self.START.pack({"side": "left"})
+
+	def __init__(self, master=None):
+		Frame.__init__(self, master)
+		self.pack()
+		self.createWidgets()
+root1 = Tk()
+
 # Start battle
-quantity = int(input("How many players? "))
+getCount = PlayerCount(master=root1)
+getCount.mainloop()
+quantity = getCount.COUNT.get()
 print("ENEMY team attacks!")
+root1.destroy()
 #speedstats = [random.randint(0,360) for i in range(2*quantity)]
-players = [PlayerCharacter(i+1) for i in range(quantity)]
-enemies = [EnemyCharacter(i+1) for i in range(quantity)]
+players = [PlayerCharacter(i+1) for i in range(int(quantity))]
+enemies = [EnemyCharacter(i+1) for i in range(int(quantity))]
 characters = players + enemies
 downedplayers = []
 random.shuffle(characters)
@@ -213,7 +332,11 @@ for character in characters:
 	character.speed = speed
 	speed += 1
 sleep(1)
-hpstatistics()
+root2 = Tk()
+gethp = hpCount(master=root2)
+gethp.mainloop()
+getmainapp = mainapp()
+getmainapp.mainloop()
 errormessage = "Command not recognized. Try again."
 itemrelinquish = "You're out of that particular item..."
 attackstring = "Which attack will it be: SLASH, FIREBALL, or ICE CRYSTAL? (You can also type \"BACK\" to go back.) "
@@ -229,4 +352,3 @@ while len(players) != 0 and len(enemies) != 0:
 			break
 		if defeatstate():
 			break
-	hpstatistics()
