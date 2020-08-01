@@ -90,7 +90,7 @@ attackbutton = None
 itemsbutton = None
 fleebutton = None
 
-def mainapp(root):
+def mainapp():
 	def build_attack(parent):
 		global attackbutton
 		attackbutton = Button(parent,text="ATTACK",justify=CENTER,fg="deepskyblue",state="disabled",command=attackapp)
@@ -111,7 +111,6 @@ def mainapp(root):
 	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
 	lo.build_elements({"A":build_attack,"I":build_items,"F":build_flee,"H":build_hpCount})
 	root.after_idle(app_idle,root)
-	return root
 
 def attackapp():
 	def build_slash(parent):
@@ -169,30 +168,44 @@ def itemsapp():
 	lo.build_elements({"H":build_heart,"SH":build_superheart,"UH":build_ultraheart,"MH":build_maxheart,"R":build_revive,"DR":build_deluxerevive,"B":build_back,"HP":build_hpCount})
 	root.mainloop()
 
+character_index = 0
+
 def choiceapp():
-	column = 0
+	global character_index
+	character_index = 0
+	def build_choice(parent):
+		global character_index
+		character = characters[character_index]
+		if character in players:
+			beligerent = "ENEMY"
+		else:
+			beligerent = "PLAYER"
+		print(f"{beligerent}x{character.identifier}")
+		w = Button(parent,text=f"{beligerent} {character.identifier}",justify=CENTER,fg="black")
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+		character_index += 1
+	def build_back(parent):
+		w = Button(parent,text="BACK",justify=CENTER,fg="black",command=mainapp)
+		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	lo = tkb.AppLayout()
+	config_opts = {"borderwidth":3,"relief":GROOVE}
+	grid_opts = {"sticky": NSEW}
+	character_dict = {}
 	for character in characters:
 		if character in players:
 			beligerent = "ENEMY"
 		else:
 			beligerent = "PLAYER"
 		print(f"{beligerent} {character.identifier}")
-		def build_choice(parent):
-			w = Button(parent,text=f"{beligerent} {character.identifier}",justify=CENTER,fg="black")
-			w.grid(row=0,column=column,padx=10,pady=5,sticky=NSEW)
-		def build_back(parent):
-			w = Button(parent,text="BACK",justify=CENTER,fg="black",command=mainapp)
-			w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
-		print(column)
-		lo = tkb.AppLayout()
-		config_opts = {"borderwidth":3,"relief":GROOVE}
-		grid_opts = {"sticky": NSEW}
-		choice = lo.row_elements(["C"],config_opts,grid_opts)
-		cb = lo.column_elements([choice,"B"],config_opts,grid_opts)
-		app = lo.column_elements([cb,"H"],config_opts,grid_opts)
-		lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
-		lo.build_elements({"C":build_choice,"B":build_back,"H":build_hpCount})
-		column += 1
+		character_dict.update({f"{beligerent}{character.identifier}":build_choice})
+
+	choice = lo.row_elements(list(character_dict),config_opts,grid_opts)
+	cb = lo.column_elements([choice,"B"],config_opts,grid_opts)
+	app = lo.column_elements([cb,"H"],config_opts,grid_opts)
+	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
+	character_dict.update({"B":build_back,"H":build_hpCount})
+	lo.build_elements(character_dict)
+	root.mainloop()
 
 class Attack:
 	def __init__(self,name,quote):
@@ -353,15 +366,16 @@ class PlayerCount(Frame):
 		self.pack()
 		self.createWidgets()
 root1 = Tk()
-root = Tk()
 root1.protocol("WM_DELETE_WINDOW",sys.exit)
-root.protocol("WM_DELETE_WINDOW",sys.exit)
 # Start battle
 getCount = PlayerCount(master=root1)
 getCount.mainloop()
 quantity = getCount.COUNT.get()
-print("ENEMY team attacks!")
 root1.destroy()
+
+root = Tk()
+root.protocol("WM_DELETE_WINDOW",sys.exit)
+print("ENEMY team attacks!")
 #speedstats = [random.randint(0,360) for i in range(2*quantity)]
 players = [PlayerCharacter(i+1) for i in range(int(quantity))]
 enemies = [EnemyCharacter(i+1) for i in range(int(quantity))]
@@ -373,7 +387,7 @@ for character in characters:
 	character.speed = speed
 	speed += 1
 sleep(1)
-mainapp(root)
+mainapp()
 root.mainloop()
 #errormessage = "Command not recognized. Try again."
 #itemrelinquish = "You're out of that particular item..."
