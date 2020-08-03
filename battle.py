@@ -181,7 +181,13 @@ def choiceapp():
 		else:
 			beligerent = "PLAYER"
 		print(f"{beligerent}x{character.identifier}")
-		w = Button(parent,text=f"{beligerent} {character.identifier}",justify=CENTER,fg="black")
+		def handler(character=character):
+			if character in players:
+				beligerent = "ENEMY"
+			else:
+				beligerent = "PLAYER"
+			print(beligerent, character.identifier)
+		w = Button(parent,text=f"{beligerent} {character.identifier}",justify=CENTER,fg="black",command=handler)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 		character_index += 1
 	def build_back(parent):
