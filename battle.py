@@ -112,9 +112,12 @@ def mainapp():
 	lo.build_elements({"A":build_attack,"I":build_items,"F":build_flee,"H":build_hpCount})
 	root.after_idle(app_idle,root)
 
+def slashbutton():
+	enemychoiceapp("SLASH")
+
 def attackapp():
 	def build_slash(parent):
-		w = Button(parent,text="SLASH",justify=CENTER,fg="silver",command=enemychoiceapp)
+		w = Button(parent,text="SLASH",justify=CENTER,fg="silver",command=slashbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_fireball(parent):
 		w = Button(parent,text="FIREBALL",justify=CENTER,fg="orangered",command=enemychoiceapp)
@@ -170,7 +173,7 @@ def itemsapp():
 
 enemy_index = 0
 
-def enemychoiceapp():
+def enemychoiceapp(attack):
 	global enemy_index
 	enemy_index = 0
 	def build_choice(parent):
@@ -178,7 +181,12 @@ def enemychoiceapp():
 		enemy = enemies[enemy_index]
 		#print(f"{beligerent}x{enemy.identifier}")
 		def handler(enemy=enemy):
-			print("ENEMY", enemy.identifier)
+			player = characters[nextplayer]
+			print(player.attacks[attack].quote)
+			sleep(2)
+			print("...and inflicted", player.attacks[attack].calcdamage(player.attack,enemy.defense), f"damage to ENEMY {enemy.identifier}!")
+			enemy.damage(player.attacks[attack].calcdamage(player.attack,enemy.defense))
+			sleep(1)
 		w = Button(parent,text=f"ENEMY {enemy.identifier}",justify=CENTER,fg="black",command=handler)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 		enemy_index += 1
@@ -190,16 +198,13 @@ def enemychoiceapp():
 	grid_opts = {"sticky": NSEW}
 	enemy_dict = {}
 	for enemy in enemies:
-		print(f"ENEMY {enemy.identifier}")
 		enemy_dict.update({f"ENEMY {enemy.identifier}":build_choice})
-
 	choiceplayer = lo.row_elements(list(enemy_dict),config_opts,grid_opts)
 	cb = lo.column_elements([choiceplayer,"B"],config_opts,grid_opts)
 	app = lo.column_elements([cb,"H"],config_opts,grid_opts)
 	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
 	enemy_dict.update({"B":build_back,"H":build_hpCount})
 	lo.build_elements(enemy_dict)
-	root.mainloop()
 
 player_index = 0
 
@@ -211,7 +216,26 @@ def playerchoiceapp():
 		player = players[player_index]
 		#print(f"{beligerent}x{player.identifier}")
 		def handler(player=player):
-			print("PLAYER", player.identifier)
+			for item in player.itemlist:
+				while item not in player.itemlist:
+					if item in itemmasterlist:
+						print(itemrelinquish)
+						sleep(1)
+					if item in heartlist:
+						player = playerchoice(players,whichplayer)
+						if player.hitpoints == 1000:
+							print(f"PLAYER {player.identifier} is already at max HP!")
+							sleep(1)
+							continue
+						player.heal(itemmasterlist[item])
+						print(f"PLAYER {player.identifier} restored {itemmasterlist[item].hp} HP!")
+						sleep(1)
+						player.hitpoints = min(player.hitpoints,1000)
+					elif item in revivelist:
+						player = playerchoice(downedplayers,whichplayer)
+						player.heal(itemmasterlist[item])
+						print(f"PLAYER {player.identifier} was revived with {itemmasterlist[item].hp} HP!")
+						sleep(1)
 		w = Button(parent,text=f"PLAYER {player.identifier}",justify=CENTER,fg="black",command=handler)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 		player_index += 1
@@ -223,16 +247,14 @@ def playerchoiceapp():
 	grid_opts = {"sticky": NSEW}
 	player_dict = {}
 	for player in players:
-		print(f"PLAYER {player.identifier}")
 		player_dict.update({f"PLAYER {player.identifier}":build_choice})
-
 	choice = lo.row_elements(list(player_dict),config_opts,grid_opts)
 	cb = lo.column_elements([choice,"B"],config_opts,grid_opts)
 	app = lo.column_elements([cb,"H"],config_opts,grid_opts)
 	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
 	player_dict.update({"B":build_back,"H":build_hpCount})
 	lo.build_elements(player_dict)
-	root.mainloop()
+	root.quit()
 
 class Attack:
 	def __init__(self,name,quote):
@@ -400,6 +422,10 @@ getCount.mainloop()
 quantity = getCount.COUNT.get()
 root1.destroy()
 
+whichenemy = "Which enemy is to be targeted? (You can also press \"BACK\" to go back.)"
+whichplayer = "Which player should use this item? (You can also press \"BACK\" to go back.)"
+itemrelinquish = "You're out of that particular item..."
+
 root = Tk()
 root.protocol("WM_DELETE_WINDOW",sys.exit)
 print("ENEMY team attacks!")
@@ -417,10 +443,7 @@ sleep(1)
 mainapp()
 root.mainloop()
 #errormessage = "Command not recognized. Try again."
-#itemrelinquish = "You're out of that particular item..."
 #attackstring = "Which attack will it be: SLASH, FIREBALL, or ICE CRYSTAL? (You can also type \"BACK\" to go back.) "
-#whichenemy = "Which enemy is to be targeted? (You can also type \"BACK\" to go back.) "
-#whichplayer = "Which player should use this item? (You can also type \"BACK\" to go back.) "
 #while len(players) != 0 and len(enemies) != 0:
 	#for character in characters:
 		#if character in players:
