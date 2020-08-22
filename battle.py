@@ -115,15 +115,21 @@ def mainapp():
 def slashbutton():
 	enemychoiceapp("SLASH")
 
+def fireballbutton():
+	enemychoiceapp("FIREBALL")
+
+def icecrystalbutton():
+	enemychoiceapp("ICE CRYSTAL")
+
 def attackapp():
 	def build_slash(parent):
 		w = Button(parent,text="SLASH",justify=CENTER,fg="silver",command=slashbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_fireball(parent):
-		w = Button(parent,text="FIREBALL",justify=CENTER,fg="orangered",command=enemychoiceapp)
+		w = Button(parent,text="FIREBALL",justify=CENTER,fg="orangered",command=fireballbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_icecrystal(parent):
-		w = Button(parent,text="ICE CRYSTAL",justify=CENTER,fg="paleturquoise",command=enemychoiceapp)
+		w = Button(parent,text="ICE CRYSTAL",justify=CENTER,fg="paleturquoise",command=icecrystalbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_back(parent):
 		w = Button(parent,text="BACK",justify=CENTER,fg="black",command=mainapp)
