@@ -128,6 +128,30 @@ def icecrystalbutton():
 	enemychoiceapp("ICE CRYSTAL")
 	root.quit()
 
+def heartbutton():
+	playerchoiceapp("HEART")
+	root.quit()
+
+def superheartbutton():
+	playerchoiceapp("SUPER HEART")
+	root.quit()
+
+def ultraheartbutton():
+	playerchoiceapp("ULTRA HEART")
+	root.quit()
+
+def maxheartbutton():
+	playerchoiceapp("MAX HEART")
+	root.quit()
+
+def revivebutton():
+	playerchoiceapp("REVIVE")
+	root.quit()
+
+def deluxerevivebutton():
+	playerchoiceapp("DELUXE REVIVE")
+	root.quit()
+
 def attackapp():
 	def build_slash(parent):
 		w = Button(parent,text="SLASH",justify=CENTER,fg="silver",command=slashbutton)
@@ -158,22 +182,22 @@ def attackapp():
 
 def itemsapp():
 	def build_heart(parent):
-		w = Button(parent,text="HEART",justify=CENTER,fg="magenta",command=playerchoiceapp)
+		w = Button(parent,text="HEART",justify=CENTER,fg="magenta",command=heartbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_superheart(parent):
-		w = Button(parent,text="SUPER HEART",justify=CENTER,fg="magenta",command=playerchoiceapp)
+		w = Button(parent,text="SUPER HEART",justify=CENTER,fg="magenta",command=superheartbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_ultraheart(parent):
-		w = Button(parent,text="ULTRA HEART",justify=CENTER,fg="magenta",command=playerchoiceapp)
+		w = Button(parent,text="ULTRA HEART",justify=CENTER,fg="magenta",command=ultraheartbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_maxheart(parent):
-		w = Button(parent,text="MAX HEART",justify=CENTER,fg="magenta",command=playerchoiceapp)
+		w = Button(parent,text="MAX HEART",justify=CENTER,fg="magenta",command=maxheartbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_revive(parent):
-		w = Button(parent,text="REVIVE",justify=CENTER,fg="darkorchid",command=playerchoiceapp)
+		w = Button(parent,text="REVIVE",justify=CENTER,fg="darkorchid",command=revivebutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_deluxerevive(parent):
-		w = Button(parent,text="DELUXE REVIVE",justify=CENTER,fg="darkorchid",command=playerchoiceapp)
+		w = Button(parent,text="DELUXE REVIVE",justify=CENTER,fg="darkorchid",command=deluxerevivebutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 	def build_back(parent):
 		w = Button(parent,text="BACK",justify=CENTER,fg="black",command=mainapp)
@@ -184,9 +208,8 @@ def itemsapp():
 	hsum = lo.row_elements(["H","SH","UH","MH"],config_opts,grid_opts)
 	rd = lo.row_elements(["R","DR"],config_opts,grid_opts)
 	hrb = lo.column_elements([hsum,rd,"B"],config_opts,grid_opts)
-	app = lo.column_elements([hrb,"HP"],config_opts,grid_opts)
-	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
-	lo.build_elements({"H":build_heart,"SH":build_superheart,"UH":build_ultraheart,"MH":build_maxheart,"R":build_revive,"DR":build_deluxerevive,"B":build_back,"HP":build_hpCount})
+	lo.create_layout(root,hrb,row=0,column=0,row_weight=1,column_weight=1)
+	lo.build_elements({"H":build_heart,"SH":build_superheart,"UH":build_ultraheart,"MH":build_maxheart,"R":build_revive,"DR":build_deluxerevive,"B":build_back})
 	root.mainloop()
 
 enemy_index = 0
@@ -235,7 +258,7 @@ def enemychoiceapp(attack):
 
 player_index = 0
 
-def playerchoiceapp():
+def playerchoiceapp(attack):
 	global player_index
 	print("top playerchoiceapp")
 	player_index = 0
@@ -244,6 +267,7 @@ def playerchoiceapp():
 		player = players[player_index]
 		#print(f"{beligerent}x{player.identifier}")
 		def handler(player=player):
+			global nextplayer
 			for item in player.itemlist:
 				while item not in player.itemlist:
 					if item in itemmasterlist:
@@ -270,6 +294,7 @@ def playerchoiceapp():
 	def build_back(parent):
 		w = Button(parent,text="BACK",justify=CENTER,fg="black",command=mainapp)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	playerchoiceroot = Tk()
 	lo = tkb.AppLayout()
 	config_opts = {"borderwidth":3,"relief":GROOVE}
 	grid_opts = {"sticky": NSEW}
@@ -278,11 +303,11 @@ def playerchoiceapp():
 		player_dict.update({f"PLAYER {player.identifier}":build_choice})
 	choice = lo.row_elements(list(player_dict),config_opts,grid_opts)
 	cb = lo.column_elements([choice,"B"],config_opts,grid_opts)
-	app = lo.column_elements([cb,"H"],config_opts,grid_opts)
-	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
-	player_dict.update({"B":build_back,"H":build_hpCount})
+	lo.create_layout(root,cb,row=0,column=0,row_weight=1,column_weight=1)
+	player_dict.update({"B":build_back})
 	lo.build_elements(player_dict)
-	root.quit()
+	playerchoiceroot.mainloop()
+	playerchoiceroot.destroy()
 	print("bot playerchoiceapp")
 
 class Attack:
