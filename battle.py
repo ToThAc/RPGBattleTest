@@ -43,9 +43,7 @@ def playerchoice(beligerents,whichprompt):
 	if len(beligerents) == 1:
 		beligerent = beligerents[0]
 	else:
-		choiceprompt = validinput(whichprompt,[str(i.identifier) for i in beligerents] + ["BACK"])
-		if choiceprompt == "BACK":
-			return False
+		choiceprompt = [str(i.identifier) for i in beligerents]
 		for beligerent in beligerents:
 			if int(choiceprompt) == beligerent.identifier:
 				break
@@ -202,6 +200,7 @@ def itemsapp():
 	def build_back(parent):
 		w = Button(parent,text="BACK",justify=CENTER,fg="black",command=mainapp)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	print("top itemsapp")
 	itemsroot = Tk()
 	itemsroot.protocol("WM_DELETE_WINDOW",sys.exit)
 	lo = tkb.AppLayout()
@@ -210,11 +209,12 @@ def itemsapp():
 	hsum = lo.row_elements(["H","SH","UH","MH"],config_opts,grid_opts)
 	rd = lo.row_elements(["R","DR"],config_opts,grid_opts)
 	hrb = lo.column_elements([hsum,rd,"B"],config_opts,grid_opts)
-	lo.create_layout(root,hrb,row=0,column=0,row_weight=1,column_weight=1)
+	lo.create_layout(itemsroot,hrb,row=0,column=0,row_weight=1,column_weight=1)
 	lo.build_elements({"H":build_heart,"SH":build_superheart,"UH":build_ultraheart,"MH":build_maxheart,"R":build_revive,"DR":build_deluxerevive,"B":build_back})
 	itemsroot.mainloop()
 	itemsroot.destroy()
-	root.mainloop()
+	root.after_idle(app_idle,root)
+	print("bot itemsapp")
 
 enemy_index = 0
 
@@ -262,36 +262,33 @@ def enemychoiceapp(attack):
 
 player_index = 0
 
-def playerchoiceapp(attack):
+def playerchoiceapp(item):
 	global player_index
 	print("top playerchoiceapp")
 	player_index = 0
 	def build_choice(parent):
 		global player_index
-		player = players[player_index]
+		player = tempplayers[player_index]
 		#print(f"{beligerent}x{player.identifier}")
 		def handler(player=player):
 			global nextplayer
-			for item in player.itemlist:
-				while item not in player.itemlist:
-					if item in itemmasterlist:
-						print(itemrelinquish)
-						sleep(1)
-					if item in heartlist:
-						player = playerchoice(players,whichplayer)
-						if player.hitpoints == 1000:
-							print(f"PLAYER {player.identifier} is already at max HP!")
-							sleep(1)
-							continue
-						player.heal(itemmasterlist[item])
-						print(f"PLAYER {player.identifier} restored {itemmasterlist[item].hp} HP!")
-						sleep(1)
-						player.hitpoints = min(player.hitpoints,1000)
-					elif item in revivelist:
-						player = playerchoice(downedplayers,whichplayer)
-						player.heal(itemmasterlist[item])
-						print(f"PLAYER {player.identifier} was revived with {itemmasterlist[item].hp} HP!")
-						sleep(1)
+			if item in heartlist:
+				if player.hitpoints == 1000:
+					print(f"PLAYER {player.identifier} is already at max HP!")
+					sleep(1)
+				player.heal(itemmasterlist[item])
+				print(f"PLAYER {player.identifier} restored {itemmasterlist[item].hp} HP!")
+				sleep(1)
+				player.hitpoints.set(min(player.hitpoints.get(),1000))
+			elif item in revivelist:
+				player.heal(itemmasterlist[item])
+				print(f"PLAYER {player.identifier} was revived with {itemmasterlist[item].hp} HP!")
+				sleep(1)
+				players.append(player)
+				characters.append(player)
+				downedplayers.remove(player)
+			nextplayer = (nextplayer + 1) % len(characters)
+			root.quit()
 		w = Button(parent,text=f"PLAYER {player.identifier}",justify=CENTER,fg="black",command=handler)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 		player_index += 1
@@ -303,11 +300,15 @@ def playerchoiceapp(attack):
 	config_opts = {"borderwidth":3,"relief":GROOVE}
 	grid_opts = {"sticky": NSEW}
 	player_dict = {}
-	for player in players:
+	if item in heartlist:
+		tempplayers = players
+	elif item in revivelist:
+		tempplayers = downedplayers
+	for player in tempplayers:
 		player_dict.update({f"PLAYER {player.identifier}":build_choice})
 	choice = lo.row_elements(list(player_dict),config_opts,grid_opts)
 	cb = lo.column_elements([choice,"B"],config_opts,grid_opts)
-	lo.create_layout(root,cb,row=0,column=0,row_weight=1,column_weight=1)
+	lo.create_layout(playerchoiceroot,cb,row=0,column=0,row_weight=1,column_weight=1)
 	player_dict.update({"B":build_back})
 	lo.build_elements(player_dict)
 	playerchoiceroot.mainloop()
@@ -486,7 +487,6 @@ root1.destroy()
 
 whichenemy = "Which enemy is to be targeted? (You can also press \"BACK\" to go back.)"
 whichplayer = "Which player should use this item? (You can also press \"BACK\" to go back.)"
-itemrelinquish = "You're out of that particular item..."
 
 root = Tk()
 root.protocol("WM_DELETE_WINDOW",sys.exit)
