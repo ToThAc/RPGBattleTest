@@ -202,6 +202,8 @@ def itemsapp():
 	def build_back(parent):
 		w = Button(parent,text="BACK",justify=CENTER,fg="black",command=mainapp)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+	itemsroot = Tk()
+	itemsroot.protocol("WM_DELETE_WINDOW",sys.exit)
 	lo = tkb.AppLayout()
 	config_opts = {"borderwidth":3,"relief":GROOVE}
 	grid_opts = {"sticky": NSEW}
@@ -210,6 +212,8 @@ def itemsapp():
 	hrb = lo.column_elements([hsum,rd,"B"],config_opts,grid_opts)
 	lo.create_layout(root,hrb,row=0,column=0,row_weight=1,column_weight=1)
 	lo.build_elements({"H":build_heart,"SH":build_superheart,"UH":build_ultraheart,"MH":build_maxheart,"R":build_revive,"DR":build_deluxerevive,"B":build_back})
+	itemsroot.mainloop()
+	itemsroot.destroy()
 	root.mainloop()
 
 enemy_index = 0
