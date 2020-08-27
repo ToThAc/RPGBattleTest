@@ -72,19 +72,37 @@ def build_hpCount(parent):
 		hp.grid(row=row,column=1,padx=10,pady=5,sticky=NSEW)
 		row += 1
 
+wt = ""
+
+def build_whoseturn(parent):
+	global wt
+	if characters[nextplayer] in players:
+		beligerent = "PLAYER"
+	else:
+		beligerent = "ENEMY"
+	wt = Label(parent)
+	wt["text"] = f"{beligerent} {characters[nextplayer].identifier}'S TURN"
+	wt.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
+
 nextplayer = 0
 def app_idle(root):
 	global nextplayer
-	print("top app_idle")
 	while characters[nextplayer] not in players:
+		global wt
 		characters[nextplayer].taketurn()
 		if defeatstate():
-			root.quit()
+			root.destroy()
+			return
 		nextplayer = (nextplayer + 1) % len(characters)
+		if characters[nextplayer] in players:
+			beligerent = "PLAYER"
+		else:
+			beligerent = "ENEMY"
+		wt["text"] = f"{beligerent} {characters[nextplayer].identifier}'S TURN"
+		root.update()
 	attackbutton["state"] = "active"
 	itemsbutton["state"] = "active"
 	fleebutton["state"] = "active"
-	print("bot app_idle")
 
 attackbutton = None
 itemsbutton = None
@@ -103,16 +121,14 @@ def mainapp():
 		global fleebutton
 		fleebutton = Button(parent,text="FLEE",justify=CENTER,fg="red",state="disabled")
 		fleebutton.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
-	print("top mainapp")
 	lo = tkb.AppLayout()
 	config_opts = {"borderwidth":3,"relief":GROOVE}
 	grid_opts = {"sticky": NSEW}
 	aif = lo.row_elements(["A","I","F"],config_opts,grid_opts)
-	app = lo.column_elements([aif,"H"],config_opts,grid_opts)
+	app = lo.column_elements(["P",aif,"H"],config_opts,grid_opts)
 	lo.create_layout(root,app,row=0,column=0,row_weight=1,column_weight=1)
-	lo.build_elements({"A":build_attack,"I":build_items,"F":build_flee,"H":build_hpCount})
+	lo.build_elements({"A":build_attack,"I":build_items,"F":build_flee,"P":build_whoseturn,"H":build_hpCount})
 	root.after_idle(app_idle,root)
-	print("bot mainapp")
 
 def slashbutton():
 	enemychoiceapp("SLASH")
@@ -163,7 +179,6 @@ def attackapp():
 	def build_back(parent):
 		w = Button(parent,text="BACK",justify=CENTER,fg="black",command=mainapp)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
-	print("top attackapp")
 	attackroot = Tk()
 	attackroot.protocol("WM_DELETE_WINDOW",sys.exit)
 	lo = tkb.AppLayout()
@@ -176,7 +191,6 @@ def attackapp():
 	attackroot.mainloop()
 	attackroot.destroy()
 	root.after_idle(app_idle,root)
-	print("bot attackapp")
 
 def itemsapp():
 	def build_heart(parent):
@@ -200,7 +214,6 @@ def itemsapp():
 	def build_back(parent):
 		w = Button(parent,text="BACK",justify=CENTER,fg="black",command=mainapp)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
-	print("top itemsapp")
 	itemsroot = Tk()
 	itemsroot.protocol("WM_DELETE_WINDOW",sys.exit)
 	lo = tkb.AppLayout()
@@ -214,13 +227,11 @@ def itemsapp():
 	itemsroot.mainloop()
 	itemsroot.destroy()
 	root.after_idle(app_idle,root)
-	print("bot itemsapp")
 
 enemy_index = 0
 
 def enemychoiceapp(attack):
 	global enemy_index
-	print("top enemychoiceapp")
 	enemy_index = 0
 	def build_choice(parent):
 		global enemy_index
@@ -228,16 +239,22 @@ def enemychoiceapp(attack):
 		#print(f"{beligerent}x{enemy.identifier}")
 		def handler(enemy=enemy):
 			global nextplayer
-			print("top enemychoiceapp.handler")
+			global wt
 			player = characters[nextplayer]
 			print(player.attacks[attack].quote)
 			sleep(2)
 			print("...and inflicted", player.attacks[attack].calcdamage(player.attack,enemy.defense), f"damage to ENEMY {enemy.identifier}!")
 			enemy.damage(player.attacks[attack].calcdamage(player.attack,enemy.defense))
 			sleep(1)
+			if defeatstate():
+				root.destroy()
 			nextplayer = (nextplayer + 1) % len(characters)
+			if characters[nextplayer] in players:
+				beligerent = "PLAYER"
+			else:
+				beligerent = "ENEMY"
+			wt["text"] = f"{beligerent} {characters[nextplayer].identifier}'S TURN"
 			root.quit()
-			print("bot enemychoiceapp.handler")
 		w = Button(parent,text=f"ENEMY {enemy.identifier}",justify=CENTER,fg="black",command=handler)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
 		enemy_index += 1
@@ -258,13 +275,11 @@ def enemychoiceapp(attack):
 	lo.build_elements(enemy_dict)
 	enemychoiceroot.mainloop()
 	enemychoiceroot.destroy()
-	print("bot enemychoiceapp")
 
 player_index = 0
 
 def playerchoiceapp(item):
 	global player_index
-	print("top playerchoiceapp")
 	player_index = 0
 	def build_choice(parent):
 		global player_index
@@ -272,6 +287,7 @@ def playerchoiceapp(item):
 		#print(f"{beligerent}x{player.identifier}")
 		def handler(player=player):
 			global nextplayer
+			global wt
 			if item in heartlist:
 				if player.hitpoints == 1000:
 					print(f"PLAYER {player.identifier} is already at max HP!")
@@ -288,6 +304,11 @@ def playerchoiceapp(item):
 				characters.append(player)
 				downedplayers.remove(player)
 			nextplayer = (nextplayer + 1) % len(characters)
+			if characters[nextplayer] in players:
+				beligerent = "PLAYER"
+			else:
+				beligerent = "ENEMY"
+			wt["text"] = f"{beligerent} {characters[nextplayer].identifier}'S TURN"
 			root.quit()
 		w = Button(parent,text=f"PLAYER {player.identifier}",justify=CENTER,fg="black",command=handler)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
@@ -313,7 +334,6 @@ def playerchoiceapp(item):
 	lo.build_elements(player_dict)
 	playerchoiceroot.mainloop()
 	playerchoiceroot.destroy()
-	print("bot playerchoiceapp")
 
 class Attack:
 	def __init__(self,name,quote):
@@ -408,7 +428,6 @@ class EnemyCharacter(Character):
 		super().__init__(identifier)
 		self.attacks = {x:EnemyAttack(x,y) for (x,y) in [["BITE",f"ENEMY {self.identifier} opens its jaws..."], ["STOMP",f"ENEMY {self.identifier} raises its foot..."], ["SMASH",f"ENEMY {self.identifier} charges up to ram into your team..."]]}
 	def taketurn(self):
-		print("top EnemyCharacter.taketurn")
 		enemystring = f"ENEMY {self.identifier} readies an attack!"
 		print(enemystring)
 		sleep(1)
@@ -420,7 +439,6 @@ class EnemyCharacter(Character):
 			print(f"...and thus PLAYER {player.identifier} received", self.attacks[enemychoice].calcdamage(self.attack,player.defense), "damage!")
 			player.damage(self.attacks[enemychoice].calcdamage(self.attack,player.defense))
 			sleep(1)
-		print("bot EnemyCharacter.taketurn")
 		return True
 
 def defeatstate():
@@ -430,6 +448,9 @@ def defeatstate():
 		else:
 			beligerent = "ENEMY"
 		if character.hitpoints.get() <= 0:
+			global nextplayer
+			if nextplayer > characters.index(character):
+				nextplayer -= 1
 			characters.remove(character)
 			if character in players:
 				downedplayers.append(character)
