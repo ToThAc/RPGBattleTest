@@ -31,24 +31,6 @@ class Revive:
 	def __init__(self,hp=1000):
 		self.hp = hp
 
-def validinput(commandstring,validlist):
-	x = input(commandstring).upper()
-	while x not in validlist:
-			print(errormessage)
-			sleep(1)
-			x = input(commandstring).upper()
-	return x
-
-def playerchoice(beligerents,whichprompt):
-	if len(beligerents) == 1:
-		beligerent = beligerents[0]
-	else:
-		choiceprompt = [str(i.identifier) for i in beligerents]
-		for beligerent in beligerents:
-			if int(choiceprompt) == beligerent.identifier:
-				break
-	return beligerent
-
 heartlist = {"HEART":Heart(),"SUPER HEART":Heart(60),"ULTRA HEART":Heart(90),"MAX HEART":Heart(120)}
 revivelist = {"REVIVE":Revive(500),"DELUXE REVIVE":Revive()}
 itemmasterlist = {**heartlist, **revivelist}
@@ -86,12 +68,13 @@ def build_whoseturn(parent):
 
 nextplayer = 0
 def app_idle(root):
+	root.title("RPGBattleTest")
 	global nextplayer
 	while characters[nextplayer] not in players:
 		global wt
 		characters[nextplayer].taketurn()
 		if defeatstate():
-			root.destroy()
+			sys.exit(0)
 			return
 		nextplayer = (nextplayer + 1) % len(characters)
 		if characters[nextplayer] in players:
@@ -109,6 +92,7 @@ itemsbutton = None
 fleebutton = None
 
 def mainapp():
+	root.title("RPGBattleTest")
 	def build_attack(parent):
 		global attackbutton
 		attackbutton = Button(parent,text="ATTACK",justify=CENTER,fg="deepskyblue",state="disabled",command=attackapp)
@@ -167,6 +151,7 @@ def deluxerevivebutton():
 	root.quit()
 
 def attackapp():
+	root.title("RPGBattleTest")
 	def build_slash(parent):
 		w = Button(parent,text="SLASH",justify=CENTER,fg="silver",command=slashbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
@@ -193,6 +178,7 @@ def attackapp():
 	root.after_idle(app_idle,root)
 
 def itemsapp():
+	root.title("RPGBattleTest")
 	def build_heart(parent):
 		w = Button(parent,text="HEART",justify=CENTER,fg="magenta",command=heartbutton)
 		w.grid(row=0,column=0,padx=10,pady=5,sticky=NSEW)
@@ -231,6 +217,7 @@ def itemsapp():
 enemy_index = 0
 
 def enemychoiceapp(attack):
+	root.title("RPGBattleTest")
 	global enemy_index
 	enemy_index = 0
 	def build_choice(parent):
@@ -247,7 +234,7 @@ def enemychoiceapp(attack):
 			enemy.damage(player.attacks[attack].calcdamage(player.attack,enemy.defense))
 			sleep(1)
 			if defeatstate():
-				root.destroy()
+				sys.exit(0)
 			nextplayer = (nextplayer + 1) % len(characters)
 			if characters[nextplayer] in players:
 				beligerent = "PLAYER"
@@ -279,6 +266,7 @@ def enemychoiceapp(attack):
 player_index = 0
 
 def playerchoiceapp(item):
+	root.title("RPGBattleTest")
 	global player_index
 	player_index = 0
 	def build_choice(parent):
@@ -358,70 +346,6 @@ class PlayerCharacter(Character):
 	def __init__(self,identifier):
 		super().__init__(identifier)
 		self.attacks = {x:PlayerAttack(x,y) for (x,y) in [["SLASH",f"PLAYER {self.identifier} swung their blade..."], ["FIREBALL",f"PLAYER {self.identifier} hurled a fireball..."], ["ICE CRYSTAL",f"PLAYER {self.identifier} chucked an icicle..."]]}
-	def taketurn(self):
-		print("top PlayerCharacter.taketurn")
-		while True:
-			string = f"Will PLAYER {self.identifier} ATTACK, use ITEMS, or FLEE? "
-			command = validinput(string,("ATTACK", "ITEMS", "FLEE"))
-			if command == "ATTACK":
-				attack = validinput(attackstring,list(self.attacks.keys()) + ["BACK"])
-				if attack in self.attacks:
-					enemy = playerchoice(enemies,whichenemy)
-					if not enemy:
-						continue
-					print(self.attacks[attack].quote)
-					sleep(2)
-					print("...and inflicted", self.attacks[attack].calcdamage(self.attack,enemy.defense), f"damage to ENEMY {enemy.identifier}!")
-					enemy.damage(self.attacks[attack].calcdamage(self.attack,enemy.defense))
-					sleep(1)
-					print("bot PlayerCharacter.taketurn")
-					return True
-				if attack == "BACK":
-					continue
-			elif command == "ITEMS":
-				itemstring = f"Which item will PLAYER {self.identifier} choose: HEART (×{self.itemlist.count('HEART')}), SUPER HEART (×{self.itemlist.count('SUPER HEART')}), ULTRA HEART (×{self.itemlist.count('ULTRA HEART')}), MAX HEART (×{self.itemlist.count('MAX HEART')}), REVIVE (×{self.itemlist.count('REVIVE')}), or DELUXE REVIVE (×{self.itemlist.count('DELUXE REVIVE')})? (You can also type \"BACK\" to go back.) "
-				item = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
-				while item not in self.itemlist:
-					if item in itemmasterlist:
-						print(itemrelinquish)
-						sleep(1)
-						item = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
-					elif item == "BACK":
-						break
-					else:
-						print(errormessage)
-						sleep(1)
-						item = validinput(itemstring,list(itemmasterlist.keys()) + ["BACK"])
-				if item == "BACK":
-					continue
-				if item in heartlist:
-					player = playerchoice(players,whichplayer)
-					if not player:
-						continue
-					if player.hitpoints == 1000:
-						print(f"PLAYER {player.identifier} is already at max HP!")
-						sleep(1)
-						continue
-					player.heal(itemmasterlist[item])
-					print(f"PLAYER {player.identifier} restored {itemmasterlist[item].hp} HP!")
-					sleep(1)
-					player.hitpoints = min(player.hitpoints,1000)
-				elif item in revivelist:
-					player = playerchoice(downedplayers,whichplayer)
-					if not player:
-						continue
-					player.heal(itemmasterlist[item])
-					print(f"PLAYER {player.identifier} was revived with {itemmasterlist[item].hp} HP!")
-					sleep(1)
-					players.append(player)
-					characters.append(player)
-					downedplayers.remove(player)
-				self.itemlist.remove(item)
-				return True
-			elif command == "FLEE":
-				print("You ran away!")
-				sleep(1)
-				return False
 
 class EnemyCharacter(Character):
 	def __init__(self,identifier):
@@ -525,15 +449,3 @@ for character in characters:
 sleep(1)
 mainapp()
 root.mainloop()
-#errormessage = "Command not recognized. Try again."
-#attackstring = "Which attack will it be: SLASH, FIREBALL, or ICE CRYSTAL? (You can also type \"BACK\" to go back.) "
-#while len(players) != 0 and len(enemies) != 0:
-	#for character in characters:
-		#if character in players:
-			#opponents = enemies
-		#else:
-			#opponents = players
-		#if not character.taketurn():
-			#break
-		#if defeatstate():
-			#break
